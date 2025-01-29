@@ -1,0 +1,52 @@
+:root {
+  --border-contrast: 222.2 47.4% 11.2%;
+  --bg: #111111;
+  --fg: #eeeeee;
+  --muted: 215.4 16.3% 46.9%;;
+}
+
+::selection {
+  background-color: hsl(var(--border-contrast));
+  color: white; 
+}
+
+.muted-image {
+  filter: grayscale(70%);
+  transition: filter 0.3s ease;
+}
+.muted-image:hover {
+  filter: grayscale(0%);
+}
+
+@font-face {
+  font-family: "JetBrains Mono";
+  src: url("/fonts/JetBrainsMono[wght].ttf") format("truetype");
+  font-weight: 100 900;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: "JetBrains Mono";
+  src: url("/fonts/JetBrainsMono-Italic[wght].ttf") format("truetype");
+  font-weight: 100 900;
+  font-style: italic;
+  font-display: swap;
+}
+
+a {
+  color: theme("colors.blue.500");
+}
+
+a:hover {
+  color: white;
+  background-color: theme("colors.blue.500");
+}
+
+a::before {
+  content: "[";
+}
+
+a::after {
+  content: "]";
+}
