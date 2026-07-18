@@ -1,0 +1,72 @@
+---
+import type { Photo } from "../data/site";
+
+interface Props {
+  photos: readonly Photo[];
+}
+
+const { photos } = Astro.props;
+---
+
+<div class="photo-grid">
+  {
+    photos.map((photo, index) => (
+      <button
+        class:list={["photo-tile", { "photo-tile--featured": index === 0 }]}
+        type="button"
+        data-photo-src={photo.src}
+        data-photo-alt={photo.alt}
+        data-photo-width={photo.width}
+        data-photo-height={photo.height}
+        aria-label={`Open photograph: ${photo.alt}`}
+      >
+        <img
+          src={photo.src}
+          alt={photo.alt}
+          width={photo.width}
+          height={photo.height}
+          loading={index === 0 ? "eager" : "lazy"}
+        />
+      </button>
+    ))
+  }
+</div>
+
+<dialog id="photo-dialog" class="photo-dialog" aria-labelledby="photo-dialog-caption">
+  <div class="photo-dialog__panel">
+    <div class="photo-dialog__bar">
+      <p id="photo-dialog-caption"></p>
+      <button id="photo-dialog-close" class="dialog-close" type="button">Close <span aria-hidden="true">×</span></button>
+    </div>
+    <div class="photo-dialog__image-wrap">
+      <img id="photo-dialog-image" src="" alt="" />
+    </div>
+  </div>
+</dialog>
+
+<script>
+  const dialog = document.querySelector<HTMLDialogElement>("#photo-dialog");
+  const dialogImage = document.querySelector<HTMLImageElement>("#photo-dialog-image");
+  const dialogCaption = document.querySelector<HTMLElement>("#photo-dialog-caption");
+  const closeButton = document.querySelector<HTMLButtonElement>("#photo-dialog-close");
+
+  document.querySelectorAll<HTMLButtonElement>("[data-photo-src]").forEach((button) => {
+    button.addEventListener("click", () => {
+      if (!dialog || !dialogImage || !dialogCaption) return;
+
+      const src = button.dataset.photoSrc ?? "";
+      const alt = button.dataset.photoAlt ?? "Community photograph";
+      dialogImage.src = src;
+      dialogImage.alt = alt;
+      dialogImage.width = Number(button.dataset.photoWidth ?? 0);
+      dialogImage.height = Number(button.dataset.photoHeight ?? 0);
+      dialogCaption.textContent = alt;
+      dialog.showModal();
+    });
+  });
+
+  closeButton?.addEventListener("click", () => dialog?.close());
+  dialog?.addEventListener("click", (event) => {
+    if (event.target === dialog) dialog.close();
+  });
+</script>

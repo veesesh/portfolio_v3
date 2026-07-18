@@ -1,47 +1,31 @@
-# Astro Starter Kit: Minimal
+# Vee's portfolio
 
-```sh
-npm create astro@latest -- --template minimal
+An Astro portfolio about systems, communities, developer experience, and the work behind builder programs.
+
+## Development
+
+```bash
+npm install
+npm run dev
 ```
 
-[![Open in StackBlitz](https://developer.stackblitz.com/img/open_in_stackblitz.svg)](https://stackblitz.com/github/withastro/astro/tree/latest/examples/minimal)
-[![Open with CodeSandbox](https://assets.codesandbox.io/github/button-edit-lime.svg)](https://codesandbox.io/p/sandbox/github/withastro/astro/tree/latest/examples/minimal)
-[![Open in GitHub Codespaces](https://github.com/codespaces/badge.svg)](https://codespaces.new/withastro/astro?devcontainer_path=.devcontainer/minimal/devcontainer.json)
+The local site runs at [http://localhost:4321](http://localhost:4321).
 
-> 🧑‍🚀 **Seasoned astronaut?** Delete this file. Have fun!
+## Checks
 
-## 🚀 Project Structure
-
-Inside of your Astro project, you'll see the following folders and files:
-
-```text
-/
-├── public/
-├── src/
-│   └── pages/
-│       └── index.astro
-└── package.json
+```bash
+npm run typecheck
+npm run build
 ```
 
-Astro looks for `.astro` or `.md` files in the `src/pages/` directory. Each page is exposed as a route based on its file name.
+## Content
 
-There's nothing special about `src/components/`, but that's where we like to put any Astro/React/Vue/Svelte/Preact components.
+The portfolio is file-backed and does not need a CMS:
 
-Any static assets, like images, can be placed in the `public/` directory.
+- `src/content/work/` contains the narrative case studies.
+- `src/content/notes/` contains field and program notes.
+- `src/content/trove/` contains the growing personal collections.
+- `src/data/site.ts` contains navigation, experience, archives, social links, and gallery metadata.
 
-## 🧞 Commands
-
-All commands are run from the root of the project, from a terminal:
-
-| Command                   | Action                                           |
-| :------------------------ | :----------------------------------------------- |
-| `npm install`             | Installs dependencies                            |
-| `npm run dev`             | Starts local dev server at `localhost:4321`      |
-| `npm run build`           | Build your production site to `./dist/`          |
-| `npm run preview`         | Preview your build locally, before deploying     |
-| `npm run astro ...`       | Run CLI commands like `astro add`, `astro check` |
-| `npm run astro -- --help` | Get help using the Astro CLI                     |
-
-## 👀 Want to learn more?
-
-Feel free to check [our documentation](https://docs.astro.build) or jump into our [Discord server](https://astro.build/chat).
+The default appearance is dark. Theme preference is stored locally in the browser, and the
+decorative Maxi companion becomes static when reduced motion is requested.

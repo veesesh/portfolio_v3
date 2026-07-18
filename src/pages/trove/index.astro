@@ -1,0 +1,34 @@
+---
+import { getCollection } from "astro:content";
+import BaseLayout from "../../layouts/BaseLayout.astro";
+
+const trove = (await getCollection("trove")).sort((a, b) => a.data.order - b.data.order);
+---
+
+<BaseLayout title="Trove" description="Vee's growing collection of tools, music, reading, cricket, art, photography, and video.">
+  <header class="page-hero shell shell--reading">
+    <p class="eyebrow">Trove</p>
+    <h1>A living shelf for<br /><em>things worth returning to.</em></h1>
+    <p>
+      Music, essays, tools, cricket, art, frames, and cuts. This is intentionally unfinished: I am
+      adding the real things slowly instead of filling it with generic recommendations.
+    </p>
+  </header>
+  <section class="section shell trove-grid" aria-label="Trove collections">
+    {trove.map((item) => (
+      <article class:list={["trove-card", { "trove-card--collecting": item.data.status === "Collecting" }] }>
+        <div class="trove-card__meta">
+          <span>{item.data.category}</span>
+          <span>{item.data.status}</span>
+        </div>
+        <h2>{item.data.title}</h2>
+        <p>{item.data.note}</p>
+        {item.data.href ? (
+          <a href={item.data.href} target="_blank" rel="noreferrer">Open collection <span aria-hidden="true">↗</span><span class="sr-only"> (opens in a new tab)</span></a>
+        ) : (
+          <span class="trove-card__soon">More soon · ✦</span>
+        )}
+      </article>
+    ))}
+  </section>
+</BaseLayout>

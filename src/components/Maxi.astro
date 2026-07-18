@@ -1,0 +1,72 @@
+<div class="maxi" data-maxi data-facing="right" aria-hidden="true">
+  <div class="maxi__runner" data-maxi-runner>
+    <div class="maxi__sprite-face">
+      <svg class="maxi__sprite" viewBox="0 0 48 48" width="48" height="48" shape-rendering="crispEdges">
+        <path class="maxi__antenna" d="M22 4h4v4h4v4h-4v4h-4v-4h-4V8h4z" />
+        <path class="maxi__body" d="M12 16h24v4h4v20h-4v4H12v-4H8V20h4z" />
+        <path class="maxi__screen" d="M14 22h20v12H14z" />
+        <path class="maxi__eye" d="M18 26h4v4h-4zm8 0h4v4h-4z" />
+        <path class="maxi__spark" d="M4 18h4v4H4zm36-8h4v4h-4z" />
+        <path class="maxi__feet" d="M14 44h8v4h-8zm12 0h8v4h-8z" />
+      </svg>
+    </div>
+    <span class="maxi__label">Maxi</span>
+  </div>
+</div>
+
+<script>
+  const maxi = document.querySelector<HTMLElement>("[data-maxi]");
+  const runner = maxi?.querySelector<HTMLElement>("[data-maxi-runner]");
+  const reducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)");
+  const finePointer = window.matchMedia("(hover: hover) and (pointer: fine)");
+
+  if (maxi && runner && finePointer.matches && !reducedMotion.matches) {
+    let currentX = Math.max(20, window.innerWidth - 92);
+    let targetX = currentX;
+    let frame = 0;
+    let lastPointerMove = performance.now();
+
+    const clampTarget = (value: number) => Math.min(Math.max(value, 16), window.innerWidth - 64);
+
+    const onPointerMove = (event: PointerEvent) => {
+      targetX = clampTarget(event.clientX - 24);
+      lastPointerMove = performance.now();
+      maxi.dataset.walking = "true";
+      if (Math.abs(targetX - currentX) > 2) {
+        maxi.dataset.facing = targetX < currentX ? "left" : "right";
+      }
+    };
+
+    const tick = () => {
+      const distance = targetX - currentX;
+      currentX += distance * 0.075;
+      runner.style.transform = `translate3d(${currentX}px, 0, 0)`;
+
+      if (Math.abs(distance) < 0.5 || performance.now() - lastPointerMove > 450) {
+        maxi.dataset.walking = "false";
+      }
+
+      frame = requestAnimationFrame(tick);
+    };
+
+    runner.style.transform = `translate3d(${currentX}px, 0, 0)`;
+    window.addEventListener("pointermove", onPointerMove, { passive: true });
+    frame = requestAnimationFrame(tick);
+
+    document.addEventListener("visibilitychange", () => {
+      if (document.hidden) {
+        cancelAnimationFrame(frame);
+        frame = 0;
+        maxi.dataset.walking = "false";
+      } else if (!frame) {
+        lastPointerMove = performance.now();
+        frame = requestAnimationFrame(tick);
+      }
+    });
+
+    window.addEventListener("resize", () => {
+      targetX = clampTarget(targetX);
+      currentX = clampTarget(currentX);
+    });
+  }
+</script>

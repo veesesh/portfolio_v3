@@ -1,0 +1,26 @@
+---
+import { navigation } from "../data/site";
+import ThemeToggle from "./ThemeToggle.astro";
+
+interface Props {
+  currentPath: string;
+}
+
+const { currentPath } = Astro.props;
+const isActive = (href: string) => currentPath === href || currentPath.startsWith(`${href}/`);
+---
+
+<header class="site-header shell">
+  <a class="wordmark" href="/" aria-label="Vee, home">
+    <span>Vee</span>
+    <span class="wordmark__mark" aria-hidden="true">✦</span>
+  </a>
+  <div class="site-header__controls">
+    <nav class="main-nav" aria-label="Primary navigation">
+      {navigation.map((item) => (
+        <a href={item.href} aria-current={isActive(item.href) ? "page" : undefined}>{item.label}</a>
+      ))}
+    </nav>
+    <ThemeToggle />
+  </div>
+</header>
