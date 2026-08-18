@@ -1,0 +1,69 @@
+---
+import { getCollection } from "astro:content";
+import BaseLayout from "../../layouts/BaseLayout.astro";
+import LinkRow from "../../components/LinkRow.astro";
+
+const shelf = (await getCollection("reading"))
+  .filter((item) => item.data.kind === "Book")
+  .sort((a, b) => a.data.order - b.data.order);
+
+const blogs = (await getCollection("writing")).sort(
+  (a, b) => b.data.date.valueOf() - a.data.date.valueOf(),
+);
+---
+
+<BaseLayout
+  title="Reading"
+  description="Books and blog posts Vee keeps close and keeps pointing people at."
+>
+  <header class="page-head column">
+    <h1>Reading</h1>
+    <p>A small archive of books and notes worth keeping close.</p>
+  </header>
+
+  <section class="section column" aria-labelledby="shelf">
+    <div class="section-head"><h2 id="shelf">Shelf</h2></div>
+    {shelf.length ? (
+      <ul class="rows">
+        {shelf.map((item) => (
+          <LinkRow
+            title={item.data.title}
+            aside={item.data.author}
+            note={item.data.note}
+            href={item.data.url}
+          />
+        ))}
+      </ul>
+    ) : (
+      <p class="section-note">This shelf is still being filled.</p>
+    )}
+  </section>
+
+  <section class="section column" aria-labelledby="blogs">
+    <div class="section-head"><h2 id="blogs">Blogs</h2></div>
+    <p class="blogs-copy">A few longer notes from me — a good place to get a feel for how I write.</p>
+    {blogs.length ? (
+      <ul class="rows">
+        {blogs.map((post) => (
+          <LinkRow
+            title={post.data.title}
+            note={post.data.summary}
+            href={post.data.url}
+          />
+        ))}
+      </ul>
+    ) : (
+      <p class="section-note">Notes are on the way.</p>
+    )}
+  </section>
+</BaseLayout>
+
+<style>
+  .blogs-copy {
+    max-width: 54ch;
+    margin: -0.7rem 0 1.35rem;
+    color: var(--muted);
+    font-size: 0.92rem;
+    line-height: 1.6;
+  }
+</style>

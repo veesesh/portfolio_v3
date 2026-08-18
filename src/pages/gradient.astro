@@ -1,0 +1,107 @@
+---
+// TEMPORARY. Hover-gradient exploration — delete once one is chosen.
+import "@fontsource-variable/bricolage-grotesque";
+import "@fontsource-variable/geist";
+import "../styles/global.css";
+import { site } from "../data/site";
+
+const rest = site.fullName.slice(site.name.length);
+
+/**
+ * Every stop is dark enough to carry on the pale ground, so no part of the word
+ * goes weak mid-gradient. Angles are shallow — a steep angle on a short word
+ * only shows a slice of the ramp.
+ */
+const options = [
+  { n: 1, name: "Teal → water blue", css: "linear-gradient(105deg, #217163 0%, #2f6aa6 100%)", note: "Current default. Both hues from the portrait." },
+  { n: 2, name: "Water blue → violet", css: "linear-gradient(105deg, #2f6aa6 0%, #5b3fb0 100%)", note: "Cool and modern; the violet gives it a lift." },
+  { n: 3, name: "Deep sea", css: "linear-gradient(105deg, #0f3f5c 0%, #2f8d7d 100%)", note: "Dark navy resolving into teal. The most sober." },
+  { n: 4, name: "Ink → teal", css: "linear-gradient(105deg, #141414 0%, #217163 100%)", note: "Starts as body text and resolves into colour." },
+  { n: 5, name: "Teal → amber", css: "linear-gradient(105deg, #217163 0%, #9a5c14 100%)", note: "The portrait's near-complementary pair. Most contrast of hue." },
+  { n: 6, name: "Amber → crimson", css: "linear-gradient(105deg, #9a5c14 0%, #b8123f 100%)", note: "Warm sunset. Ignores the blue entirely." },
+  { n: 7, name: "Blue → teal → amber", css: "linear-gradient(105deg, #2f6aa6 0%, #217163 52%, #9a5c14 100%)", note: "Three stops — the whole palette in one sweep." },
+  { n: 8, name: "Ink → slate", css: "linear-gradient(105deg, #141414 0%, #4a5f7a 100%)", note: "Almost monochrome. The quietest option here." },
+  { n: 9, name: "Teal → blue, vertical", css: "linear-gradient(180deg, #217163 0%, #2f6aa6 100%)", note: "Same as 1 but top-to-bottom, to compare direction." },
+  { n: 10, name: "Teal → blue, steep", css: "linear-gradient(135deg, #217163 0%, #2f6aa6 100%)", note: "Same as 1 at 135°, so the ramp reads more diagonally." },
+];
+---
+
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="robots" content="noindex, nofollow" />
+    <title>Name gradient options</title>
+  </head>
+  <body>
+    <div class="ground" aria-hidden="true"></div>
+    <div class="wrap">
+      <h1>Hover gradient</h1>
+      <p class="lead">
+        The rainbow, the trail and the sparks are gone. Each of these is a single clean gradient
+        clipped to the glyphs — this is what you'd see on hover. Tell me a number.
+      </p>
+
+      {options.map((o) => (
+        <div class="row">
+          <p class="row__tag">{o.n} — {o.name} · {o.note}</p>
+          <p class="row__name" style={`background-image:${o.css}`}>
+            {site.name}<span>{rest}</span>
+          </p>
+          <p class="row__css">{o.css}</p>
+        </div>
+      ))}
+    </div>
+
+    <style>
+      .wrap {
+        width: min(100% - 3rem, 46rem);
+        margin: 3rem auto 5rem;
+      }
+      h1 {
+        margin: 0;
+        font-family: var(--display);
+        font-weight: 600;
+        font-size: 1.7rem;
+        letter-spacing: -0.03em;
+      }
+      .lead {
+        max-width: 58ch;
+        color: var(--muted);
+        font-size: 0.9rem;
+      }
+      .row {
+        border-top: 1px solid var(--rule);
+        padding-block: 1.5rem 1.3rem;
+      }
+      .row__tag {
+        margin: 0 0 0.5rem;
+        color: var(--muted);
+        font-family: var(--mono);
+        font-size: 0.68rem;
+        letter-spacing: 0.05em;
+        text-transform: uppercase;
+      }
+      .row__name {
+        margin: 0;
+        font-family: var(--display);
+        font-size: clamp(2.4rem, 8vw, 3.9rem);
+        font-weight: 600;
+        letter-spacing: -0.04em;
+        line-height: 1.05;
+        -webkit-background-clip: text;
+        background-clip: text;
+        color: transparent;
+        -webkit-text-fill-color: transparent;
+      }
+      .row__css {
+        margin: 0.5rem 0 0;
+        color: var(--faint);
+        font-family: var(--mono);
+        font-size: 0.66rem;
+        word-break: break-all;
+      }
+    </style>
+  </body>
+</html>

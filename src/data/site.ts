@@ -3,21 +3,6 @@ export type SiteLink = {
   href: string;
 };
 
-export type TimelineItem = {
-  organization: string;
-  role: string;
-  period: string;
-  summary: string;
-  href?: string;
-};
-
-export type ArchiveItem = {
-  title: string;
-  descriptor: string;
-  summary: string;
-  href?: string;
-};
-
 export type Photo = {
   src: string;
   alt: string;
@@ -25,16 +10,48 @@ export type Photo = {
   height: number;
 };
 
-export const navigation: readonly SiteLink[] = [
-  { label: "Work", href: "/work" },
-  { label: "Notes", href: "/notes" },
-  { label: "Trove", href: "/trove" },
-  { label: "Gallery", href: "/gallery" },
+export type LifeSection = {
+  title: string;
+  eyebrow: string;
+  note: string;
+};
+
+export const site = {
+  name: "Vee",
+  /** The wordmark expands from `name` to this on hover. */
+  fullName: "Veesesh",
+  aliasNote: "Hey, my real name is Veesesh but I also go by Vee. That's my alias",
+  role: "Community and Operations, Devfolio",
+  location: "Hyderabad / Bengaluru",
+  email: "curiousvee19@gmail.com",
+} as const;
+
+/**
+ * About copy, split around the one link in it. Kept as segments rather than a
+ * string with markup so the meta description can be derived as plain text
+ * without ever duplicating the sentence.
+ */
+export const about = {
+  before: "I work where community, developer experience, and operations meet. At ",
+  link: { label: "Devfolio", href: "https://devfolio.co" },
+  after:
+    " I lead builder initiatives and turn repetitive work into small, useful agents and internal tools.",
+} as const;
+
+export const aboutPlain = `${about.before}${about.link.label}${about.after}`;
+
+const allNavigation: readonly SiteLink[] = [
+  { label: "build", href: "/build" },
+  { label: "reading", href: "/reading" },
+  { label: "listening", href: "/listening" },
+  { label: "pictures", href: "/pictures" },
 ];
+
+export const navigation: readonly SiteLink[] = allNavigation;
 
 export const profileLinks: readonly SiteLink[] = [
   { label: "GitHub", href: "https://github.com/veesesh" },
-  { label: "X / Twitter", href: "https://x.com/vee19twt" },
+  { label: "X", href: "https://x.com/vee19twt" },
   { label: "LinkedIn", href: "https://www.linkedin.com/in/vee19/" },
   { label: "Email", href: "mailto:curiousvee19@gmail.com" },
   {
@@ -43,104 +60,34 @@ export const profileLinks: readonly SiteLink[] = [
   },
 ];
 
-export const experience: readonly TimelineItem[] = [
-  {
-    organization: "Devfolio",
-    role: "Community & Operations",
-    period: "Jan 2026 — now",
-    summary:
-      "Leading builder initiatives and building the systems behind community, support, and developer experience.",
-    href: "https://devfolio.co",
-  },
-  {
-    organization: "Hackerabad",
-    role: "Community lead & mentor",
-    period: "Apr 2022 — now",
-    summary:
-      "Helping a student-run developer community in Hyderabad grow through mentorship, events, and campus programs.",
-    href: "https://hackerabad.framer.website/",
-  },
-  {
-    organization: "CodeDay Hyderabad",
-    role: "Regional manager & volunteer",
-    period: "Jul 2022 — Dec 2024",
-    summary:
-      "Volunteered across two editions, then led a regional event for student artists, programmers, musicians, and writers.",
-    href: "https://event.codeday.org/en-US/hyderabad",
-  },
-  {
-    organization: "KalaKumbh",
-    role: "Flutter developer intern",
-    period: "Jun — Aug 2023",
-    summary: "Built and maintained Flutter experiences across web and mobile.",
-    href: "https://www.linkedin.com/company/kalakumbh/",
-  },
-];
+/** Public Spotify source; swapping the playlist only requires changing this URL. */
+export const spotify = {
+  playlistUrl: "https://open.spotify.com/playlist/2oqpUuxrELm2pkQItwKJuq",
+  embedUrl: "https://open.spotify.com/embed/playlist/2oqpUuxrELm2pkQItwKJuq?utm_source=generator",
+  title: "Vee's listening rotation",
+} as const;
 
-export const programArchive: readonly ArchiveItem[] = [
+/** A deliberately loose space for the non-work bits, ready for notes later. */
+export const lifeSections: readonly LifeSection[] = [
   {
-    title: "Build India 2026",
-    descriptor: "Program operations · Bengaluru",
-    summary:
-      "A builder-first AI sprint focused on products designed for Indian users and realities.",
-    href: "https://buildindia2026.devfolio.co/overview",
+    title: "Movies",
+    eyebrow: "On screen",
+    note: "The films I keep returning to, the scenes I replay, and the ones I will definitely make you watch.",
   },
   {
-    title: "Push to Prod with Genspark & Claude",
-    descriptor: "Event team · Singapore",
-    summary:
-      "An in-person sprint for solving real internal workflow problems with AI.",
-    href: "https://push-to-prod.devfolio.co/overview",
+    title: "Moving around",
+    eyebrow: "Off screen",
+    note: "The physical things I play, attempt, and use to get out of my own head.",
   },
   {
-    title: "Warpspeed 2025",
-    descriptor: "Event team · Bengaluru",
-    summary:
-      "A 24-hour hackathon for agents, structured LLM workflows, and multi-agent systems.",
-    href: "https://warpspeed2025.devfolio.co/overview",
+    title: "Biryani",
+    eyebrow: "Very serious research",
+    note: "An ongoing, extremely personal investigation into the perfect plate of biryani.",
   },
   {
-    title: "ETHIndiaVilla",
-    descriptor: "Event team · Bengaluru",
-    summary:
-      "A smaller, intentional ETHIndia format built around close collaboration between selected builders and mentors.",
-    href: "https://ethindia-villa.devfolio.co/overview",
-  },
-  {
-    title: "ETHDenver 2026",
-    descriptor: "Online support",
-    summary: "Supported the online side of Devfolio's work for the Ethereum builder program.",
-    href: "https://ethdenver2026.devfolio.co/overview",
-  },
-  {
-    title: "The Synthesis",
-    descriptor: "Online support",
-    summary:
-      "Supported an agent-native hackathon where agents assisted with projects and evaluation while people kept final judgment.",
-    href: "https://devfolio.co/blog/synthesis/",
-  },
-];
-
-export const earlierBuilds: readonly ArchiveItem[] = [
-  {
-    title: "NAASH — Not Another AI Shell",
-    descriptor: "AI CLI · HackThisFall 2024 winner",
-    summary:
-      "A natural-language terminal shell with clipboard and error-log history, built with a team.",
-    href: "https://github.com/Sushants-Git/team-gap",
-  },
-  {
-    title: "Scratch Blogs",
-    descriptor: "TypeScript · Gemini · Azure",
-    summary:
-      "A multimodal writing environment for Markdown, diagrams, and images. I worked on the backend.",
-    href: "https://github.com/veesesh/backend_scratchblogs",
-  },
-  {
-    title: "Snippet Safe",
-    descriptor: "React · MongoDB · Frost Hacks 2024 winner",
-    summary: "A team-built bookmarking tool for storing and organizing code snippets.",
-    href: "https://github.com/Sushants-Git/SnippetsSafe",
+    title: "Dream places",
+    eyebrow: "Someday",
+    note: "Places I want to be, routes I want to take, and small reasons to keep a bag half-packed.",
   },
 ];
 

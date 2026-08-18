@@ -1,0 +1,30 @@
+---
+interface Props {
+  title: string;
+  aside?: string;
+  note?: string;
+  href?: string;
+}
+
+const { title, aside, note, href } = Astro.props;
+const external = Boolean(href?.startsWith("http"));
+---
+
+<li class="row">
+  {href ? (
+    <a class="row__link" href={href} data-sfx="row" target={external ? "_blank" : undefined} rel={external ? "noreferrer" : undefined}>
+      <span class="row__title">
+        {title}{external && <span class="row__arrow" aria-hidden="true">↗</span>}
+        {external && <span class="sr-only"> (opens in a new tab)</span>}
+      </span>
+      {aside && <span class="row__year">{aside}</span>}
+      {note && <p class="row__note">{note}</p>}
+    </a>
+  ) : (
+    <div class="row__body">
+      <span class="row__title">{title}</span>
+      {aside && <span class="row__year">{aside}</span>}
+      {note && <p class="row__note">{note}</p>}
+    </div>
+  )}
+</li>

@@ -1,0 +1,16 @@
+---
+// Opt-in cursor colour field. See src/scripts/rainbow.ts.
+---
+
+<button class="rainbow-toggle" type="button" data-rainbow-toggle aria-pressed="false">
+  <span class="rainbow-toggle__dot" aria-hidden="true"></span>
+  <span>activate background rainbow mode 🌈</span>
+</button>
+
+<script>
+  import { mountRainbow } from "../scripts/rainbow";
+
+  const button = document.querySelector<HTMLButtonElement>("[data-rainbow-toggle]");
+  const layer = document.querySelector<HTMLElement>("[data-rainbow-layer]");
+  if (button && layer) mountRainbow(button, layer);
+</script>

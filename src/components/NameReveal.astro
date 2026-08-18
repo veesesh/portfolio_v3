@@ -1,0 +1,45 @@
+---
+import { site } from "../data/site";
+
+interface Props {
+  /** "mark" is the small header wordmark; "hero" is the large centred name. */
+  variant: "mark" | "hero";
+  href?: string;
+  /**
+   * When set, the note is exposed to assistive tech via aria-describedby. Only
+   * one instance per page should do this, or the same aside gets announced twice.
+   */
+  noteId?: string;
+}
+
+const { variant, href, noteId } = Astro.props;
+
+// The visible text starts as the alias and grows the remainder of the full name.
+const rest = site.fullName.startsWith(site.name)
+  ? site.fullName.slice(site.name.length)
+  : site.fullName;
+
+const Tag = href ? "a" : "span";
+---
+
+<span class:list={["name-reveal", `name-reveal--${variant}`]}>
+  <Tag
+    class="name-reveal__name"
+    href={href}
+    data-sfx="name"
+    aria-label={href ? `${site.fullName}, home` : undefined}
+    aria-describedby={noteId}
+  >
+    <span>{site.name}</span><span class="name-reveal__rest" aria-hidden={href ? "true" : undefined}
+      >{rest}</span
+    >
+  </Tag>
+  <span
+    class="name-reveal__note"
+    id={noteId}
+    role={noteId ? "tooltip" : undefined}
+    aria-hidden={noteId ? undefined : "true"}
+  >
+    {site.aliasNote} <span class="name-reveal__hand">✌️</span>
+  </span>
+</span>

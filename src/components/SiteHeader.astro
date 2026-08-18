@@ -1,6 +1,6 @@
 ---
 import { navigation } from "../data/site";
-import ThemeToggle from "./ThemeToggle.astro";
+import NameReveal from "./NameReveal.astro";
 
 interface Props {
   currentPath: string;
@@ -8,19 +8,21 @@ interface Props {
 
 const { currentPath } = Astro.props;
 const isActive = (href: string) => currentPath === href || currentPath.startsWith(`${href}/`);
+
+// The home page already shows the name at hero scale; a second one in the
+// header just reads as a duplicate. Every other page keeps it as the way back.
+const isHome = currentPath === "/";
 ---
 
-<header class="site-header shell">
-  <a class="wordmark" href="/" aria-label="Vee, home">
-    <span>Vee</span>
-    <span class="wordmark__mark" aria-hidden="true">✦</span>
-  </a>
-  <div class="site-header__controls">
-    <nav class="main-nav" aria-label="Primary navigation">
+<header class:list={["site-header", "column", { "site-header--bare": isHome }]}>
+  {!isHome && <NameReveal variant="mark" href="/" noteId="alias-note" />}
+  <div class="header-right">
+    <nav class="main-nav" aria-label="Primary">
       {navigation.map((item) => (
-        <a href={item.href} aria-current={isActive(item.href) ? "page" : undefined}>{item.label}</a>
+        <a href={item.href} data-sfx="nav" aria-current={isActive(item.href) ? "page" : undefined}>
+          {item.label}
+        </a>
       ))}
     </nav>
-    <ThemeToggle />
   </div>
 </header>

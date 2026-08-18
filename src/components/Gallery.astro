@@ -9,63 +9,199 @@ const { photos } = Astro.props;
 ---
 
 <div class="photo-grid">
-  {
-    photos.map((photo, index) => (
-      <button
-        class:list={["photo-tile", { "photo-tile--featured": index === 0 }]}
-        type="button"
-        data-photo-src={photo.src}
-        data-photo-alt={photo.alt}
-        data-photo-width={photo.width}
-        data-photo-height={photo.height}
-        aria-label={`Open photograph: ${photo.alt}`}
-      >
-        <img
-          src={photo.src}
-          alt={photo.alt}
-          width={photo.width}
-          height={photo.height}
-          loading={index === 0 ? "eager" : "lazy"}
-        />
-      </button>
-    ))
-  }
+  {photos.map((photo, index) => (
+    <button
+      class="photo-tile"
+      type="button"
+      data-sfx="row"
+      data-photo-src={photo.src}
+      data-photo-alt={photo.alt}
+      aria-label={`Open photograph: ${photo.alt}`}
+    >
+      <img
+        src={photo.src}
+        alt={photo.alt}
+        width={photo.width}
+        height={photo.height}
+        loading={index < 2 ? "eager" : "lazy"}
+        decoding="async"
+      />
+    </button>
+  ))}
 </div>
 
 <dialog id="photo-dialog" class="photo-dialog" aria-labelledby="photo-dialog-caption">
   <div class="photo-dialog__panel">
     <div class="photo-dialog__bar">
       <p id="photo-dialog-caption"></p>
-      <button id="photo-dialog-close" class="dialog-close" type="button">Close <span aria-hidden="true">×</span></button>
+      <button id="photo-dialog-close" class="photo-dialog__close" type="button">
+        Close <span aria-hidden="true">×</span>
+      </button>
     </div>
-    <div class="photo-dialog__image-wrap">
+    <div class="photo-dialog__image">
       <img id="photo-dialog-image" src="" alt="" />
     </div>
   </div>
 </dialog>
 
+<style>
+  .photo-grid {
+    display: grid;
+    grid-template-columns: repeat(6, minmax(0, 1fr));
+    gap: 0.5rem;
+    padding-bottom: clamp(3rem, 7vw, 5rem);
+  }
+
+  /* Alternating rows of two wide tiles and three narrow ones. */
+  .photo-tile {
+    grid-column: span 2;
+    aspect-ratio: 4 / 3;
+    overflow: hidden;
+    padding: 0;
+    border: 0;
+    border-radius: 8px;
+    background: var(--rule);
+    cursor: zoom-in;
+  }
+
+  .photo-tile:nth-child(5n + 1),
+  .photo-tile:nth-child(5n + 2) {
+    grid-column: span 3;
+  }
+
+  .photo-tile img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    filter: saturate(0.85);
+    transition: filter 220ms var(--ease), transform 320ms var(--ease);
+  }
+
+  .photo-dialog {
+    width: min(94vw, 76rem);
+    max-width: none;
+    height: min(90vh, 52rem);
+    max-height: none;
+    padding: 0;
+    border: 1px solid var(--rule-strong);
+    border-radius: 12px;
+    background: var(--page);
+    color: var(--ink);
+    box-shadow: 0 2rem 6rem rgba(20, 18, 14, 0.28);
+  }
+
+  .photo-dialog::backdrop {
+    background: rgba(24, 22, 18, 0.62);
+    backdrop-filter: blur(3px);
+  }
+
+  .photo-dialog__panel {
+    display: grid;
+    height: 100%;
+    grid-template-rows: auto minmax(0, 1fr);
+  }
+
+  .photo-dialog__bar {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 1.5rem;
+    border-bottom: 1px solid var(--rule);
+    padding: 0.7rem 0.7rem 0.7rem 1.1rem;
+  }
+
+  .photo-dialog__bar p {
+    margin: 0;
+    color: var(--muted);
+    font-size: 0.82rem;
+    line-height: 1.4;
+  }
+
+  .photo-dialog__close {
+    flex: none;
+    border: 1px solid var(--rule);
+    border-radius: 999px;
+    background: transparent;
+    padding: 0.4rem 0.8rem;
+    font-family: var(--mono);
+    font-size: 0.72rem;
+    cursor: pointer;
+    transition: border-color 130ms ease, color 130ms ease;
+  }
+
+  .photo-dialog__close:hover {
+    border-color: var(--accent);
+    color: var(--accent);
+  }
+
+  .photo-dialog__image {
+    display: grid;
+    min-height: 0;
+    place-items: center;
+    overflow: hidden;
+    padding: 0.9rem;
+  }
+
+  .photo-dialog__image img {
+    max-width: 100%;
+    max-height: 100%;
+    width: auto;
+    height: auto;
+    object-fit: contain;
+    border-radius: 4px;
+  }
+
+  @media (hover: hover) and (pointer: fine) {
+    .photo-tile:hover img {
+      filter: saturate(1);
+      transform: scale(1.02);
+    }
+  }
+
+  @media (max-width: 780px) {
+    .photo-grid {
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 0.4rem;
+    }
+
+    .photo-tile,
+    .photo-tile:nth-child(5n + 1),
+    .photo-tile:nth-child(5n + 2) {
+      grid-column: span 1;
+    }
+
+    .photo-dialog {
+      width: calc(100vw - 1rem);
+      height: calc(100vh - 1rem);
+    }
+
+    .photo-dialog__bar p {
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+    }
+  }
+</style>
+
 <script>
   const dialog = document.querySelector<HTMLDialogElement>("#photo-dialog");
-  const dialogImage = document.querySelector<HTMLImageElement>("#photo-dialog-image");
-  const dialogCaption = document.querySelector<HTMLElement>("#photo-dialog-caption");
-  const closeButton = document.querySelector<HTMLButtonElement>("#photo-dialog-close");
+  const image = document.querySelector<HTMLImageElement>("#photo-dialog-image");
+  const caption = document.querySelector<HTMLElement>("#photo-dialog-caption");
+  const close = document.querySelector<HTMLButtonElement>("#photo-dialog-close");
 
   document.querySelectorAll<HTMLButtonElement>("[data-photo-src]").forEach((button) => {
     button.addEventListener("click", () => {
-      if (!dialog || !dialogImage || !dialogCaption) return;
-
-      const src = button.dataset.photoSrc ?? "";
-      const alt = button.dataset.photoAlt ?? "Community photograph";
-      dialogImage.src = src;
-      dialogImage.alt = alt;
-      dialogImage.width = Number(button.dataset.photoWidth ?? 0);
-      dialogImage.height = Number(button.dataset.photoHeight ?? 0);
-      dialogCaption.textContent = alt;
+      if (!dialog || !image || !caption) return;
+      image.src = button.dataset.photoSrc ?? "";
+      image.alt = button.dataset.photoAlt ?? "Community photograph";
+      caption.textContent = button.dataset.photoAlt ?? "";
       dialog.showModal();
     });
   });
 
-  closeButton?.addEventListener("click", () => dialog?.close());
+  close?.addEventListener("click", () => dialog?.close());
+
+  // Click the backdrop (anything outside the panel) to dismiss.
   dialog?.addEventListener("click", (event) => {
     if (event.target === dialog) dialog.close();
   });

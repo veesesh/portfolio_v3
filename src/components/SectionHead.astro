@@ -1,0 +1,17 @@
+---
+interface Props {
+  label: string;
+  href?: string;
+  seeAll?: string;
+  id?: string;
+}
+
+const { label, href, seeAll = "see all", id } = Astro.props;
+---
+
+<div class="section-head">
+  <h2 id={id}>{label}</h2>
+  {href && (
+    <a class="see-all" href={href} data-sfx="nav">{seeAll} <span aria-hidden="true">→</span></a>
+  )}
+</div>

@@ -1,0 +1,182 @@
+---
+import { POSTER_URL } from "./portrait/engine";
+
+interface Props {
+  alt: string;
+}
+
+const { alt } = Astro.props;
+---
+
+<div class="portrait">
+  <div class="portrait__halo" aria-hidden="true"></div>
+  <div class="portrait__tile" data-portrait-tile>
+    <img
+      class="portrait__still"
+      src={POSTER_URL}
+      alt={alt}
+      width="1024"
+      height="1024"
+      fetchpriority="high"
+    />
+    <svg
+      class="portrait__meter"
+      data-portrait-meter
+      viewBox="0 0 100 100"
+      fill="none"
+      aria-hidden="true"
+    >
+      <path
+        class="portrait__meter-track"
+        d="M50 2 H93 A5 5 0 0 1 98 7 V93 A5 5 0 0 1 93 98 H7 A5 5 0 0 1 2 93 V7 A5 5 0 0 1 7 2 H50"
+      />
+      <path
+        class="portrait__meter-fill"
+        data-portrait-meter-fill
+        d="M50 2 H93 A5 5 0 0 1 98 7 V93 A5 5 0 0 1 93 98 H7 A5 5 0 0 1 2 93 V7 A5 5 0 0 1 7 2 H50"
+      />
+    </svg>
+  </div>
+</div>
+
+<style>
+  .portrait {
+    position: relative;
+    width: 100%;
+    max-width: 15rem;
+    margin-inline: auto;
+    aspect-ratio: 1;
+  }
+
+  /* Soft coloured halo behind the tile, tracking the cursor. */
+  .portrait__halo {
+    position: absolute;
+    inset: -18%;
+    z-index: 0;
+    pointer-events: none;
+    border-radius: 50%;
+    background: radial-gradient(
+      42% 42% at calc(var(--glow-x, 0.5) * 100%) calc(var(--glow-y, 0.5) * 100%),
+      var(--style-glow) 0%,
+      transparent 72%
+    );
+    opacity: calc(var(--glow-i, 0) * 0.5);
+    filter: blur(22px);
+  }
+
+  .portrait__tile {
+    position: relative;
+    z-index: 1;
+    width: 100%;
+    height: 100%;
+    overflow: hidden;
+    border-radius: 14px;
+    background: var(--style-bg);
+    transform: perspective(900px) rotateX(var(--tilt-x, 0deg)) rotateY(var(--tilt-y, 0deg));
+    transform-style: preserve-3d;
+    will-change: transform;
+    box-shadow: 0 1px 2px rgba(20, 18, 14, 0.06), 0 12px 32px -12px rgba(20, 18, 14, 0.18);
+  }
+
+  /* The real photo sits underneath as the poster frame and the no-WebGL
+     fallback. The canvas the engine appends covers it once it paints. */
+  .portrait__still {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+  }
+
+  /* Scratch meter, traced around the tile's own edge. Sits above the canvas
+     the engine appends (which has z-index auto), and must never eat pointer
+     events or the scratching wouldn't register. */
+  .portrait__meter {
+    position: absolute;
+    inset: 0;
+    z-index: 2;
+    width: 100%;
+    height: 100%;
+    pointer-events: none;
+    opacity: 0;
+  }
+
+  .portrait__meter-track {
+    stroke: rgba(12, 10, 8, 0.32);
+    stroke-width: 2.4;
+  }
+
+  .portrait__meter-fill {
+    stroke: #fff;
+    stroke-width: 2.4;
+    stroke-linecap: round;
+    filter: drop-shadow(0 0 1.5px rgba(12, 10, 8, 0.45));
+  }
+
+  @media (max-width: 640px) {
+    .portrait {
+      max-width: 12.5rem;
+    }
+  }
+</style>
+
+<script>
+  import { LegoReveal } from "./portrait/engine";
+
+  const tile = document.querySelector<HTMLElement>("[data-portrait-tile]");
+
+  if (tile) {
+    const root = document.documentElement;
+    const reduced = window.matchMedia("(prefers-reduced-motion: reduce)");
+    const meter = tile.querySelector<SVGSVGElement>("[data-portrait-meter]");
+    const meterFill = tile.querySelector<SVGPathElement>("[data-portrait-meter-fill]");
+
+    // getTotalLength beats a hardcoded perimeter: the path can change without
+    // the dash maths silently going wrong.
+    const ringLength = meterFill?.getTotalLength() ?? 0;
+    if (meterFill && ringLength) {
+      meterFill.style.strokeDasharray = `${ringLength}`;
+      meterFill.style.strokeDashoffset = `${ringLength}`;
+    }
+
+    const engine = new LegoReveal(tile, (s) => {
+      root.style.setProperty("--style-bg", s.bg);
+      root.style.setProperty("--style-glow", s.glowColor);
+      tile.style.setProperty("--tilt-x", `${s.tiltX.toFixed(3)}deg`);
+      tile.style.setProperty("--tilt-y", `${s.tiltY.toFixed(3)}deg`);
+      tile.style.setProperty("--glow-x", s.glowX.toFixed(4));
+      tile.style.setProperty("--glow-y", s.glowY.toFixed(4));
+      tile.style.setProperty("--glow-i", s.glowI.toFixed(4));
+
+      if (meter && meterFill && ringLength) {
+        // Fades in over the first sixth of the meter so a stray pass doesn't
+        // flash a ring, then rides revealAll back down after it fires.
+        const shown = Math.max(Math.min(1, s.scratch * 6), s.revealAll);
+        meter.style.opacity = shown.toFixed(3);
+        const filled = Math.max(s.scratch, s.revealAll);
+        meterFill.style.strokeDashoffset = `${ringLength * (1 - filled)}`;
+      }
+    });
+
+    if (!engine.ok) {
+      // No WebGL, or the shaders refused to compile. The still image is
+      // already in the DOM, so just clear the dead canvas away.
+      engine.destroy();
+    } else {
+      if (reduced.matches) {
+        // One frame, no loop. Wait for both critical textures first, or we
+        // paint a half-loaded tile that never updates.
+        engine.onReady = () => engine.renderStill();
+      } else {
+        const io = new IntersectionObserver(
+          (entries) => {
+            for (const entry of entries) engine.setVisible(entry.isIntersecting);
+          },
+          { rootMargin: "120px" },
+        );
+        io.observe(tile);
+
+        const ro = new ResizeObserver(() => engine.resize());
+        ro.observe(tile);
+      }
+    }
+  }
+</script>

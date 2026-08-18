@@ -1,0 +1,76 @@
+---
+import { getCollection, render } from "astro:content";
+import BaseLayout from "../../layouts/BaseLayout.astro";
+import ProjectRow from "../../components/ProjectRow.astro";
+import SectionHead from "../../components/SectionHead.astro";
+
+const entries = await getCollection("projects");
+const projects = await Promise.all(
+  entries.map(async (entry) => ({
+    entry,
+    Content: entry.body?.trim() ? (await render(entry)).Content : undefined,
+  })),
+);
+
+const categories = [
+  {
+    id: "initiatives",
+    label: "Initiatives",
+    category: "initiative" as const,
+    copy: "I’ve worked on Warpspeed 2025, ETHIndiaVilla, Student Hackathon Grants with AWS, Build India 2026, Push to Prod with Genspark & Claude in Singapore, and I lead Push to Prod: Building at the Frontier — alongside the other builder programs and hackathons below.",
+  },
+  {
+    id: "systems",
+    label: "Systems",
+    category: "system" as const,
+    copy: "Hermes and Maxi automations, the community agent, Devfolio support boards, support retrieval, and editorial workflows — all made to give people more context and time for judgment.",
+  },
+  {
+    id: "own-projects",
+    label: "Own projects",
+    category: "personal" as const,
+    copy: "Things I make outside work, usually with friends, curiosity, and a short deadline.",
+  },
+];
+
+const inCategory = (category: (typeof categories)[number]["category"]) =>
+  projects
+    .filter((item) => item.entry.data.category === category)
+    .sort((a, b) => a.entry.data.order - b.entry.data.order);
+---
+
+<BaseLayout
+  title="Build"
+  description="Builder initiatives, internal systems, and side projects Vee has helped bring to life."
+>
+  <header class="page-head column">
+    <h1>Build</h1>
+    <p>The rooms, systems, and side projects I keep building.</p>
+  </header>
+
+  {categories.map((category) => {
+    const items = inCategory(category.category);
+    return (
+      <section class="section column" aria-labelledby={category.id} id={category.id}>
+        <SectionHead id={category.id} label={category.label} />
+        <p class="build-copy">{category.copy}</p>
+        <ul class="rows">
+          {items.map((item) => (
+            <ProjectRow entry={item.entry} Content={item.Content} expanded={Boolean(item.Content)} />
+          ))}
+        </ul>
+      </section>
+    );
+  })}
+</BaseLayout>
+
+<style>
+  .build-copy {
+    max-width: 54ch;
+    margin: -0.7rem 0 1.35rem;
+    color: var(--muted);
+    font-size: 0.92rem;
+    line-height: 1.6;
+    text-wrap: pretty;
+  }
+</style>

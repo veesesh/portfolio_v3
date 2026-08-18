@@ -1,0 +1,23 @@
+---
+// Hover sound, off by default. See src/scripts/sound.ts.
+---
+
+<button class="sound-toggle" type="button" data-sound-toggle aria-pressed="false" aria-label="Turn hover sound on">
+  <svg class="sound-off" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+    <path d="M11 5 6 9H3v6h3l5 4z" />
+    <path d="M17 9.5 22 14.5" />
+    <path d="M22 9.5 17 14.5" />
+  </svg>
+  <svg class="sound-on" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+    <path d="M11 5 6 9H3v6h3l5 4z" />
+    <path d="M16 9a4 4 0 0 1 0 6" />
+    <path d="M19 6.5a8 8 0 0 1 0 11" />
+  </svg>
+</button>
+
+<script>
+  import { mountSound } from "../scripts/sound";
+
+  const button = document.querySelector<HTMLButtonElement>("[data-sound-toggle]");
+  if (button) mountSound(button);
+</script>

@@ -1,0 +1,22 @@
+---
+import BaseLayout from "../../layouts/BaseLayout.astro";
+import Gallery from "../../components/Gallery.astro";
+import { photos } from "../../data/site";
+---
+
+<BaseLayout
+  title="Pictures"
+  description="A visual archive of the builder communities, events, and rooms Vee helped bring together."
+>
+  <header class="page-head column">
+    <h1>Pictures</h1>
+    <p>
+      Community moments rather than a photography portfolio — rooms full of builders, and the
+      people who made them worth showing up for.
+    </p>
+  </header>
+
+  <section class="column column--wide" aria-label="Photographs">
+    <Gallery photos={photos} />
+  </section>
+</BaseLayout>

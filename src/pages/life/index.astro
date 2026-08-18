@@ -1,0 +1,70 @@
+---
+import BaseLayout from "../../layouts/BaseLayout.astro";
+import { lifeSections } from "../../data/site";
+
+const idFor = (title: string) => title.toLowerCase().replaceAll(" ", "-");
+---
+
+<BaseLayout title="Other parts of my life" description="The non-work things Vee likes, plays, eats, and dreams about.">
+  <header class="page-head column">
+    <h1>Other parts of my life</h1>
+    <p>The unstructured stuff: things I like, places I want to go, and opinions I may develop too strongly.</p>
+  </header>
+
+  <section class="section column life-grid" aria-label="Life notes">
+    {lifeSections.map((section) => (
+      <article class="life-card" id={idFor(section.title)}>
+        <p class="meta">{section.eyebrow}</p>
+        <h2>{section.title}</h2>
+        <p>{section.note}</p>
+        <p class="life-card__prompt">Notes coming soon.</p>
+      </article>
+    ))}
+  </section>
+</BaseLayout>
+
+<style>
+  .life-grid {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 0.7rem;
+  }
+
+  .life-card {
+    min-height: 15rem;
+    border: 1px solid var(--rule);
+    border-radius: 9px;
+    padding: clamp(1.2rem, 3vw, 1.8rem);
+  }
+
+  .life-card .meta,
+  .life-card p {
+    margin: 0;
+  }
+
+  .life-card h2 {
+    margin: 0.45rem 0 0.75rem;
+    font-family: var(--display);
+    font-size: 1.45rem;
+    font-weight: 600;
+    letter-spacing: -0.025em;
+  }
+
+  .life-card > p:not(.meta):not(.life-card__prompt) {
+    color: var(--muted);
+    line-height: 1.6;
+  }
+
+  .life-card__prompt {
+    margin-top: 2rem !important;
+    color: var(--faint);
+    font-size: 0.78rem;
+    font-style: italic;
+  }
+
+  @media (max-width: 560px) {
+    .life-grid {
+      grid-template-columns: 1fr;
+    }
+  }
+</style>

@@ -7,51 +7,65 @@ const linkSchema = z.object({
   href: z.url(),
 });
 
-const work = defineCollection({
-  loader: glob({ base: "./src/content/work", pattern: "**/*.{md,mdx}" }),
+/** Where I have worked. One entry per organization. */
+const roles = defineCollection({
+  loader: glob({ base: "./src/content/roles", pattern: "**/*.{md,mdx}" }),
   schema: z.object({
-    title: z.string(),
-    kicker: z.string(),
-    summary: z.string(),
+    organization: z.string(),
     role: z.string(),
-    period: z.string(),
-    order: z.number(),
-    featured: z.boolean().default(false),
-    tags: z.array(z.string()).default([]),
-    links: z.array(linkSchema).default([]),
-  }),
-});
-
-const notes = defineCollection({
-  loader: glob({ base: "./src/content/notes", pattern: "**/*.{md,mdx}" }),
-  schema: z.object({
-    title: z.string(),
+    location: z.string(),
+    start: z.coerce.date(),
+    /** Controls the visible portfolio order. Lower values appear first. */
+    displayOrder: z.number(),
+    /** null means "still there". */
+    end: z.coerce.date().nullable().default(null),
     summary: z.string(),
-    date: z.coerce.date(),
-    kind: z.enum(["Field note", "Program note", "Published elsewhere"]),
-    tags: z.array(z.string()).default([]),
-    externalUrl: z.url().optional(),
-  }),
-});
-
-const trove = defineCollection({
-  loader: glob({ base: "./src/content/trove", pattern: "**/*.{md,mdx}" }),
-  schema: z.object({
-    title: z.string(),
-    category: z.enum([
-      "Tools",
-      "Reading",
-      "Music",
-      "Cricket",
-      "Art",
-      "Photography",
-      "Video",
-    ]),
-    note: z.string(),
-    order: z.number(),
-    status: z.enum(["Collected", "Collecting"]),
     href: z.url().optional(),
   }),
 });
 
-export const collections = { work, notes, trove };
+/** What I did in those roles. `org` points at a roles entry id. */
+const projects = defineCollection({
+  loader: glob({ base: "./src/content/projects", pattern: "**/*.{md,mdx}" }),
+  schema: z.object({
+    title: z.string(),
+    org: z.string(),
+    descriptor: z.string(),
+    summary: z.string(),
+    year: z.string(),
+    /** Sorts newest first within an org. */
+    order: z.number(),
+    /** The way a build appears on the public Build page. */
+    category: z.enum(["initiative", "system", "personal"]),
+    featured: z.boolean().default(false),
+    href: z.url().optional(),
+    links: z.array(linkSchema).default([]),
+  }),
+});
+
+/** Things I have published, here or elsewhere. */
+const writing = defineCollection({
+  loader: glob({ base: "./src/content/writing", pattern: "**/*.{md,mdx}" }),
+  schema: z.object({
+    title: z.string(),
+    date: z.coerce.date(),
+    outlet: z.string(),
+    summary: z.string(),
+    url: z.url(),
+  }),
+});
+
+/** Things worth reading, and why. */
+const reading = defineCollection({
+  loader: glob({ base: "./src/content/reading", pattern: "**/*.{md,mdx}" }),
+  schema: z.object({
+    title: z.string(),
+    author: z.string(),
+    kind: z.enum(["Book", "Essay", "Paper", "Talk"]),
+    note: z.string(),
+    order: z.number(),
+    url: z.url().optional(),
+  }),
+});
+
+export const collections = { roles, projects, writing, reading };

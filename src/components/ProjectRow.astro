@@ -1,0 +1,117 @@
+---
+import type { CollectionEntry } from "astro:content";
+
+interface Props {
+  entry: CollectionEntry<"projects">;
+  /** Rendered markdown body, when the project has one. */
+  Content?: unknown;
+  /** Use on the Build page, where the full portfolio narrative should be visible. */
+  expanded?: boolean;
+}
+
+const { entry, Content, expanded = false } = Astro.props;
+const { title, year, summary, descriptor, href, links } = entry.data;
+const Body = Content as astroHTML.JSX.Element | undefined;
+const external = Boolean(href?.startsWith("http"));
+---
+
+{
+  Body ? (
+    <li class="row">
+      <details class="disclosure" open={expanded}>
+        <summary class="row__link disclosure__summary" data-sfx="row">
+          <span class="row__title">
+            {title}
+            <svg class="disclosure__chevron" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+              <path d="m4 6 4 4 4-4" />
+            </svg>
+          </span>
+          <span class="row__year">{year}</span>
+          <span class="row__note">{descriptor} — {summary}</span>
+        </summary>
+        <div class="prose">
+          <Body />
+        </div>
+        {links.length > 0 && (
+          <div class="disclosure__links">
+            {links.map((link) => (
+              <a href={link.href} data-sfx="nav" target="_blank" rel="noreferrer">
+                {link.label} <span aria-hidden="true">↗</span>
+                <span class="sr-only"> (opens in a new tab)</span>
+              </a>
+            ))}
+          </div>
+        )}
+      </details>
+    </li>
+  ) : (
+    <li class="row">
+      {href ? (
+        <a class="row__link" href={href} data-sfx="row" target={external ? "_blank" : undefined} rel={external ? "noreferrer" : undefined}>
+          <span class="row__title">
+            {title}
+            {external && <span class="row__arrow" aria-hidden="true">↗</span>}
+            {external && <span class="sr-only"> (opens in a new tab)</span>}
+          </span>
+          <span class="row__year">{year}</span>
+          <span class="row__note">{descriptor} — {summary}</span>
+        </a>
+      ) : (
+        <div class="row__body">
+          <span class="row__title">{title}</span>
+          <span class="row__year">{year}</span>
+          <span class="row__note">{descriptor} — {summary}</span>
+        </div>
+      )}
+    </li>
+  )
+}
+
+<style>
+  .disclosure__summary {
+    cursor: pointer;
+    list-style: none;
+  }
+
+  .disclosure__summary::-webkit-details-marker {
+    display: none;
+  }
+
+  .disclosure__chevron {
+    display: inline-block;
+    width: 13px;
+    height: 13px;
+    margin-left: 0.4rem;
+    vertical-align: -1px;
+    color: var(--faint);
+    transition: transform 200ms var(--ease), color 130ms ease;
+  }
+
+  .disclosure[open] .disclosure__chevron {
+    transform: rotate(180deg);
+  }
+
+  .disclosure__links {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.4rem 1.2rem;
+    padding-bottom: 1.5rem;
+  }
+
+  .disclosure__links a {
+    font-family: var(--mono);
+    font-size: 0.74rem;
+    color: var(--accent);
+    text-decoration: none;
+  }
+
+  @media (hover: hover) and (pointer: fine) {
+    .disclosure__summary:hover .row__title {
+      color: var(--accent);
+    }
+
+    .disclosure__summary:hover .disclosure__chevron {
+      color: var(--accent);
+    }
+  }
+</style>
