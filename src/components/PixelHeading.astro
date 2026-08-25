@@ -1,0 +1,64 @@
+---
+/**
+ * A page heading with its section's pixel icon beside it.
+ *
+ * Two treatments, switched site-wide by `headingVariant` in data/site.ts:
+ *
+ * - `a` — the heading keeps the size it has everywhere else and the icon comes
+ *   down to meet it, at 2× (28px of ink).
+ * - `b` — the icon leads at 3× (42px of ink) and the heading grows to match.
+ *
+ * Every sprite inks exactly rows 1–14, so within either treatment all four sit
+ * at identical height.
+ *
+ * The icon is decorative — the heading text is what carries the meaning — so it
+ * is hidden from assistive tech rather than given a label that would only
+ * repeat the word next to it.
+ */
+import { headingVariant } from "../data/site";
+import { HEAD_SCALES, type HeadVariant } from "../scripts/pixel-field";
+
+interface Props {
+  title: string;
+  /** Must match a `section` in data/pixel-sprites.ts. */
+  section: string;
+  /** Overrides the site-wide choice. Only the labs should need this. */
+  variant?: HeadVariant;
+  /**
+   * Screen pixels per sprite pixel, overriding the variant's. For headings that
+   * are not page-head sized — the Pictures banner runs much larger, and a 2×
+   * icon beside it would read as a stray mark rather than a companion.
+   */
+  scale?: number;
+}
+
+const { title, section, variant = headingVariant, scale } = Astro.props;
+const px = scale ?? HEAD_SCALES[variant];
+// The variant classes carry the sizes for the standard scales; anything else
+// has to say so itself, or the reserved box and the canvas disagree.
+const box = scale ? `width: ${16 * scale}px; height: ${16 * scale}px` : undefined;
+---
+
+<div class:list={["page-head__line", `page-head__line--${variant}`]}>
+  <h1>{title}</h1>
+  <span
+    class="page-head__icon"
+    data-sprite={section}
+    data-scale={px}
+    style={box}
+    aria-hidden="true"></span>
+</div>
+
+<script>
+  import { PixelField } from "../scripts/pixel-field";
+  import { pixelSprites } from "../data/pixel-sprites";
+
+  const reduced = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+
+  document.querySelectorAll<HTMLElement>(".page-head__icon").forEach((slot) => {
+    const sprite = pixelSprites.find((s) => s.section === slot.dataset.sprite);
+    const scale = Number(slot.dataset.scale);
+    if (!sprite || !scale) return;
+    new PixelField(slot, { sprite, reduced, scale });
+  });
+</script>

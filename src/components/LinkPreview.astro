@@ -1,0 +1,209 @@
+---
+/**
+ * A screenshot of where a link goes, shown in browser chrome while hovering it.
+ *
+ * The preview is an image, not an iframe. X and LinkedIn both refuse to be
+ * framed (`X-Frame-Options`), so a live embed would render an empty box on
+ * exactly the two links this is most wanted for. A screenshot also loads
+ * instantly and cannot show a logged-out state to one visitor and a logged-in
+ * one to another.
+ *
+ * One panel serves every link on the page: the handler swaps its contents and
+ * moves it, rather than each link carrying a hidden copy of its own.
+ */
+---
+
+<div class="preview" id="link-preview" aria-hidden="true" data-hidden>
+  <div class="preview__chrome">
+    <span class="preview__dots"><i></i><i></i><i></i></span>
+    <span class="preview__url"></span>
+  </div>
+  <div class="preview__shot">
+    <img alt="" decoding="async" />
+  </div>
+</div>
+
+<script>
+  const panel = document.getElementById("link-preview");
+
+  // Needs a real pointer to hover with, and a screen worth floating a panel on.
+  const fine = window.matchMedia("(hover: hover) and (pointer: fine)").matches;
+
+  if (panel && fine) {
+    const urlEl = panel.querySelector<HTMLElement>(".preview__url")!;
+    const img = panel.querySelector<HTMLImageElement>("img")!;
+    const reduced = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+
+    const OFFSET = 20;
+    let raf = 0;
+    let target = { x: 0, y: 0 };
+    let at = { x: 0, y: 0 };
+    let active: HTMLElement | null = null;
+
+    /** Keeps the whole panel on screen, flipping it left or up near an edge. */
+    const place = (x: number, y: number) => {
+      const w = panel.offsetWidth;
+      const h = panel.offsetHeight;
+      const maxX = window.innerWidth - w - 12;
+      const maxY = window.innerHeight - h - 12;
+      target = {
+        x: Math.max(12, Math.min(x + OFFSET, maxX)),
+        y: Math.max(12, Math.min(y + OFFSET, maxY)),
+      };
+    };
+
+    const draw = () => {
+      raf = 0;
+      // Easing the panel toward the cursor rather than pinning it stops the
+      // image jittering pixel-for-pixel with the mouse, which at this size
+      // reads as noise.
+      const k = reduced ? 1 : 0.22;
+      at.x += (target.x - at.x) * k;
+      at.y += (target.y - at.y) * k;
+      panel.style.transform = `translate3d(${at.x.toFixed(1)}px, ${at.y.toFixed(1)}px, 0)`;
+      if (active && (Math.abs(target.x - at.x) > 0.5 || Math.abs(target.y - at.y) > 0.5)) tick();
+    };
+
+    const tick = () => {
+      if (!raf) raf = requestAnimationFrame(draw);
+    };
+
+    /** `x.com/vee19twt` reads better in a URL bar than the full href. */
+    const pretty = (href: string) => {
+      try {
+        const u = new URL(href);
+        return (u.host + u.pathname).replace(/^www\./, "").replace(/\/$/, "");
+      } catch {
+        return href;
+      }
+    };
+
+    const show = (link: HTMLElement, x: number, y: number) => {
+      const src = link.dataset.preview;
+      if (!src) return;
+      active = link;
+      img.src = src;
+      urlEl.textContent = pretty(link.getAttribute("href") ?? "");
+      // Jump to the first position instead of gliding in from wherever the
+      // last preview was left.
+      place(x, y);
+      at = { ...target };
+      panel.style.transform = `translate3d(${at.x}px, ${at.y}px, 0)`;
+      delete panel.dataset.hidden;
+      tick();
+    };
+
+    const hide = () => {
+      active = null;
+      panel.dataset.hidden = "";
+    };
+
+    document.addEventListener("pointerover", (event) => {
+      const link = (event.target as Element | null)?.closest<HTMLElement>("[data-preview]");
+      if (!link || link === active) return;
+      show(link, event.clientX, event.clientY);
+    });
+
+    document.addEventListener("pointerout", (event) => {
+      const link = (event.target as Element | null)?.closest<HTMLElement>("[data-preview]");
+      if (link && link === active) hide();
+    });
+
+    document.addEventListener("pointermove", (event) => {
+      if (!active) return;
+      place(event.clientX, event.clientY);
+      tick();
+    }, { passive: true });
+
+    // Keyboard users get the same preview, parked beside the link itself.
+    document.addEventListener("focusin", (event) => {
+      const link = (event.target as Element | null)?.closest<HTMLElement>("[data-preview]");
+      if (!link) return;
+      const r = link.getBoundingClientRect();
+      show(link, r.left, r.bottom);
+    });
+
+    document.addEventListener("focusout", (event) => {
+      const link = (event.target as Element | null)?.closest<HTMLElement>("[data-preview]");
+      if (link && link === active) hide();
+    });
+
+    window.addEventListener("scroll", () => { if (active) hide(); }, { passive: true });
+  }
+</script>
+
+<style>
+  .preview {
+    position: fixed;
+    top: 0;
+    left: 0;
+    z-index: 80;
+    width: min(24rem, 42vw);
+    border-radius: 10px;
+    overflow: hidden;
+    background: #1c1c1e;
+    box-shadow:
+      0 1px 2px rgb(0 0 0 / 0.16),
+      0 18px 44px rgb(0 0 0 / 0.26);
+    pointer-events: none;
+    transition: opacity 140ms var(--ease), scale 140ms var(--ease);
+  }
+
+  .preview[data-hidden] {
+    opacity: 0;
+    scale: 0.97;
+  }
+
+  .preview__chrome {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 0.45rem 0.6rem;
+  }
+
+  .preview__dots {
+    display: flex;
+    flex: none;
+    gap: 0.25rem;
+  }
+
+  .preview__dots i {
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    background: #48484a;
+  }
+
+  .preview__url {
+    flex: 1;
+    min-width: 0;
+    border-radius: 5px;
+    background: #2c2c2e;
+    padding: 0.2rem 0.5rem;
+    color: #a1a1a6;
+    font-family: var(--mono);
+    font-size: 0.66rem;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+
+  .preview__shot {
+    aspect-ratio: 16 / 10;
+    background: #101012;
+  }
+
+  .preview__shot img {
+    display: block;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    object-position: top center;
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .preview {
+      transition-duration: 1ms;
+    }
+  }
+</style>

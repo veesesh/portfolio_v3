@@ -1,0 +1,346 @@
+---
+import type { CollectionEntry } from "astro:content";
+import { SCENE_ASPECT, SPINE_BOXES } from "../data/shelf";
+
+interface Props {
+  books: CollectionEntry<"reading">[];
+  /**
+   * The shelf is the point of the reading page, so it loads eagerly there. On
+   * the home page it sits far below the fold and should wait its turn.
+   */
+  eager?: boolean;
+}
+
+const { books, eager = true } = Astro.props;
+
+/**
+ * A hotspot can't move a book that's baked into the photo — but it can paint
+ * that book's own slice of the same photo and move *that*. Background size and
+ * offset are precomputed here because CSS calc() cannot divide by a variable.
+ *
+ * Books with no measured box are dropped rather than rendered at zero size: an
+ * invisible button is worse than an absent one, because it still takes a tab
+ * stop and announces a book nobody can see.
+ */
+const shelf = books.flatMap((entry) => {
+  const box = SPINE_BOXES[entry.id];
+  if (!box) return [];
+  const { x, y, w, h } = box;
+  return [{
+    entry, x, y, w, h,
+    // A slice `w`% of the scene wide has to scale the whole photo by 100/w
+    // to show that region at its original size.
+    bgSize: `${10000 / w}% ${10000 / h}%`,
+    bgPos: `${(x / (100 - w)) * 100}% ${(y / (100 - h)) * 100}%`,
+  }];
+});
+---
+
+<div class="shelf">
+  <div class="shelf__scene">
+    <img
+      class="shelf__art"
+      src="/images/reading-shelf.jpg"
+      alt="A shelf of Vee's books, among them Atomic Habits, A Little Life, The White Tiger, Blue Sisters, Build and a Franz Kafka collection."
+      width="1672"
+      height="941"
+      loading={eager ? "eager" : "lazy"}
+    />
+    <ul class="shelf__row">
+      {shelf.map((book) => (
+        <li>
+          <button
+            class="spine"
+            type="button"
+            data-sfx="row"
+            style={`--x: ${book.x}%; --y: ${book.y}%; --w: ${book.w}%; --h: ${book.h}%; --bs: ${book.bgSize}; --bp: ${book.bgPos}`}
+            data-title={book.entry.data.title}
+            data-author={book.entry.data.author}
+            data-note={book.entry.data.note}
+            data-url={book.entry.data.url ?? ""}
+            aria-label={`${book.entry.data.title} by ${book.entry.data.author}`}
+          >
+            <span class="sr-only">Open {book.entry.data.title}</span>
+          </button>
+        </li>
+      ))}
+    </ul>
+  </div>
+</div>
+
+<dialog id="book-dialog" class="book-dialog" aria-labelledby="book-dialog-title">
+  <div class="book-dialog__panel">
+    <p class="book-dialog__kicker">From the shelf</p>
+    <h2 id="book-dialog-title"></h2>
+    <p class="book-dialog__author"></p>
+    <p class="book-dialog__note"></p>
+    <a class="book-dialog__link" href="#" target="_blank" rel="noreferrer" hidden>
+      Find it <span aria-hidden="true">↗</span>
+    </a>
+    <button class="book-dialog__close" type="button">Close <span aria-hidden="true">×</span></button>
+  </div>
+</dialog>
+
+<style define:vars={{ sceneAspect: SCENE_ASPECT }}>
+  /* The photograph is the shelf. Hit areas sit directly over the real spines,
+     so the interaction stays honest rather than redrawing an approximation
+     alongside it. */
+  .shelf {
+    display: block;
+    padding-top: 0.3rem;
+  }
+
+  .shelf__scene {
+    position: relative;
+    overflow: hidden;
+    min-width: 0;
+    /* The photo's own ratio, so nothing is cropped and the boxes — which are
+       percentages of the image — land where they were measured. */
+    aspect-ratio: var(--sceneAspect);
+    border: 1px solid var(--rule);
+    border-radius: 10px;
+    background: #ececeb;
+  }
+
+  .shelf__art {
+    display: block;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+  }
+
+  .shelf__row {
+    position: absolute;
+    inset: 0;
+    display: block;
+    margin: 0;
+    padding: 0;
+    list-style: none;
+  }
+
+  .shelf__row li {
+    display: contents;
+  }
+
+  /* The button is only ever a hit area, and it never moves. An earlier version
+     put the lift on the button itself, which slid it out from under the cursor
+     — hover was lost the instant it was gained, so the spine flickered and
+     could not be clicked at all. The painted slice moves; the target stays. */
+  .spine {
+    position: absolute;
+    left: var(--x);
+    top: var(--y);
+    display: block;
+    box-sizing: border-box;
+    width: var(--w);
+    height: var(--h);
+    padding: 0;
+    border: 0;
+    background: transparent;
+    cursor: var(--cursor-hand);
+  }
+
+  /* This spine's own slice of the shelf photo, so it can move independently of
+     the picture it was cut from. Invisible until hovered — until then the
+     photograph underneath already shows the book. */
+  .spine::before {
+    content: "";
+    position: absolute;
+    inset: 0;
+    border-radius: 2px;
+    background-image: url("/images/reading-shelf.jpg");
+    background-repeat: no-repeat;
+    background-size: var(--bs);
+    background-position: var(--bp);
+    opacity: 0;
+    transform-origin: bottom center;
+    transition: transform 260ms var(--ease), opacity 160ms ease, box-shadow 260ms ease;
+  }
+
+  /* The slice matches its book exactly. Extending it downward to cover the gap
+     it leaves seemed obvious, but that paints a second, offset copy of the
+     shelf board that never quite lines up. The gap should read as shadow
+     anyway, so a drop shadow fills it instead. */
+  .spine:hover::before,
+  .spine:focus-visible::before {
+    opacity: 1;
+    transform: translateY(-7.5%) scale(1.03);
+    box-shadow:
+      0 3px 0 0 rgba(60, 55, 48, 0.34),
+      0 10px 14px -4px rgba(40, 36, 30, 0.4),
+      0 20px 28px -10px rgba(40, 36, 30, 0.28);
+  }
+
+  .spine:focus-visible {
+    outline: 2px solid var(--ink);
+    outline-offset: 2px;
+  }
+
+  /* Coarse pointers have no hover to preview with, and a tap that shifts the
+     thing being tapped is disorienting — leave the picture still. */
+  @media (hover: none), (pointer: coarse) {
+    .spine:hover::before {
+      opacity: 0;
+      transform: none;
+      box-shadow: none;
+    }
+  }
+
+  /* Sliding is the whole idea, so with motion reduced the spine holds its place
+     and marks itself with a ring instead. */
+  @media (prefers-reduced-motion: reduce) {
+    .spine:hover::before,
+    .spine:focus-visible::before {
+      transform: none;
+      box-shadow: inset 0 0 0 2px rgba(20, 18, 14, 0.55);
+    }
+  }
+
+  /* ---------------- the opened book ---------------- */
+  .book-dialog {
+    width: min(92vw, 28rem);
+    max-width: none;
+    padding: 0;
+    border: 1px solid var(--rule-strong);
+    border-radius: 12px;
+    background: var(--page);
+    color: var(--ink);
+    box-shadow: 0 2rem 5rem -1.5rem rgba(20, 18, 14, 0.35);
+  }
+
+  .book-dialog::backdrop {
+    background: rgba(24, 22, 18, 0.5);
+    backdrop-filter: blur(3px);
+  }
+
+  /* The card pops rather than appearing: a short rise and scale reads as the
+     book being opened, and gives the eye something to follow from the spine
+     that was just clicked. */
+  .book-dialog[open] {
+    animation: book-pop 200ms var(--ease);
+  }
+
+  .book-dialog[open]::backdrop {
+    animation: book-fade 200ms ease;
+  }
+
+  @keyframes book-pop {
+    from {
+      opacity: 0;
+      transform: translateY(8px) scale(0.97);
+    }
+  }
+
+  @keyframes book-fade {
+    from {
+      opacity: 0;
+    }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .book-dialog[open],
+    .book-dialog[open]::backdrop {
+      animation: none;
+    }
+  }
+
+  .book-dialog__panel {
+    padding: 1.4rem 1.5rem 1.5rem;
+  }
+
+  .book-dialog__kicker {
+    margin: 0;
+    color: var(--faint);
+    font-family: var(--mono);
+    font-size: 0.66rem;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+  }
+
+  .book-dialog h2 {
+    margin: 0.55rem 0 0;
+    font-family: var(--display);
+    font-size: 1.5rem;
+    font-weight: 600;
+    letter-spacing: -0.025em;
+    line-height: 1.15;
+    text-wrap: balance;
+  }
+
+  .book-dialog__author {
+    margin: 0.3rem 0 0;
+    color: var(--muted);
+    font-size: 0.88rem;
+  }
+
+  .book-dialog__note {
+    margin: 1rem 0 0;
+    color: var(--muted);
+    font-size: 0.94rem;
+    line-height: 1.65;
+    text-wrap: pretty;
+  }
+
+  /* An author `display` beats the hidden attribute's UA `display: none`, so a
+     book with no link would still show a dead "Find it". */
+  .book-dialog__link[hidden] {
+    display: none;
+  }
+
+  .book-dialog__link {
+    display: inline-block;
+    margin: 1.1rem 0 0;
+    color: var(--ink);
+    font-size: 0.85rem;
+    font-weight: 500;
+    text-underline-offset: 0.22em;
+  }
+
+  .book-dialog__close {
+    display: block;
+    margin: 1.3rem 0 0;
+    border: 1px solid var(--rule);
+    border-radius: 999px;
+    background: transparent;
+    padding: 0.4rem 0.8rem;
+    font-family: var(--mono);
+    font-size: 0.72rem;
+    cursor: var(--cursor-hand);
+    transition: border-color 130ms ease, color 130ms ease;
+  }
+
+  .book-dialog__close:hover {
+    border-color: var(--ink);
+  }
+</style>
+
+<script>
+  const dialog = document.querySelector<HTMLDialogElement>("#book-dialog");
+  const title = dialog?.querySelector<HTMLElement>("#book-dialog-title");
+  const author = dialog?.querySelector<HTMLElement>(".book-dialog__author");
+  const note = dialog?.querySelector<HTMLElement>(".book-dialog__note");
+  const link = dialog?.querySelector<HTMLAnchorElement>(".book-dialog__link");
+  const close = dialog?.querySelector<HTMLButtonElement>(".book-dialog__close");
+
+  document.querySelectorAll<HTMLButtonElement>(".spine").forEach((spine) => {
+    spine.addEventListener("click", () => {
+      if (!dialog || !title || !author || !note || !link) return;
+      title.textContent = spine.dataset.title ?? "";
+      author.textContent = spine.dataset.author ?? "";
+      note.textContent = spine.dataset.note ?? "";
+      const url = spine.dataset.url;
+      if (url) {
+        link.href = url;
+        link.hidden = false;
+      } else {
+        link.hidden = true;
+      }
+      dialog.showModal();
+    });
+  });
+
+  close?.addEventListener("click", () => dialog?.close());
+  dialog?.addEventListener("click", (event) => {
+    if (event.target === dialog) dialog.close();
+  });
+</script>

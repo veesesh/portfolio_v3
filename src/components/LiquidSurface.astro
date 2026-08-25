@@ -1,0 +1,144 @@
+---
+/**
+ * Blocks poured into one shape.
+ *
+ * Takes its cards as children: anything carrying `data-liquid-card` is laid out
+ * on the grid and folded into the generated outline. The card's own styling is
+ * the caller's business — this only owns the shape underneath.
+ *
+ * Fill comes from the three bloom colours, which are the portrait's own hues
+ * taken to ~94% white. They are the one palette on this site already documented
+ * as pale enough to leave text contrast alone.
+ */
+interface Props {
+  /** 0 = crisp corners, ~70 = gooey blobs. */
+  joint?: number;
+  gap?: number;
+  cardHeight?: number;
+  draggable?: boolean;
+  /** Adds the joint slider. For the lab, not a real page. */
+  controls?: boolean;
+  /**
+   * Adds a button that puts dragged cards back. Worth having wherever cards can
+   * be moved: without it the only way to undo a drag is to reload the page.
+   */
+  reset?: boolean;
+}
+
+const {
+  joint = 34,
+  gap = 14,
+  cardHeight = 250,
+  draggable = true,
+  controls = false,
+  reset = draggable,
+} = Astro.props;
+
+// Two surfaces on one page would otherwise collide on the gradient's id, and
+// the second would silently paint with the first one's fill.
+const fillId = `liquid-fill-${Math.random().toString(36).slice(2, 8)}`;
+---
+
+{(controls || reset) && (
+  <div class="liquid-controls">
+    {controls && (
+      <>
+        <label for="liquid-k">Joint</label>
+        <input id="liquid-k" type="range" min="0" max="70" value={joint} step="1" />
+        <output id="liquid-k-out" for="liquid-k">{joint}</output>
+      </>
+    )}
+    {reset && <button id="liquid-reset" type="button">Reset positions</button>}
+  </div>
+)}
+
+<div
+  class:list={["liquid", { "liquid--draggable": draggable }]}
+  data-liquid
+  data-joint={joint}
+  data-gap={gap}
+  data-card-height={cardHeight}
+  data-draggable={draggable ? "" : undefined}
+  data-controls={controls ? "" : undefined}
+>
+  <svg class="liquid__paint" aria-hidden="true" focusable="false">
+    <defs>
+      <linearGradient id={fillId} x1="0" y1="0" x2="1" y2="1">
+        <stop offset="0" stop-color="var(--bloom-blue)" />
+        <stop offset="0.55" stop-color="var(--bloom-teal)" />
+        <stop offset="1" stop-color="var(--bloom-amber)" />
+      </linearGradient>
+    </defs>
+    <g fill={`url(#${fillId})`} fill-rule="evenodd"></g>
+  </svg>
+
+  <slot />
+</div>
+
+<script>
+  import { LiquidField } from "../scripts/liquid-field";
+
+  const reduced = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+
+  document.querySelectorAll<HTMLElement>("[data-liquid]").forEach((stage) => {
+    const field = new LiquidField(stage, {
+      reduced,
+      joint: Number(stage.dataset.joint),
+      gap: Number(stage.dataset.gap),
+      cardHeight: Number(stage.dataset.cardHeight),
+      draggable: "draggable" in stage.dataset,
+    });
+
+    document.getElementById("liquid-reset")?.addEventListener("click", () => field.reset());
+
+    if (!("controls" in stage.dataset)) return;
+
+    const slider = document.getElementById("liquid-k") as HTMLInputElement | null;
+    const readout = document.getElementById("liquid-k-out");
+
+    slider?.addEventListener("input", () => {
+      field.setJoint(Number(slider.value));
+      if (readout) readout.textContent = slider.value;
+    });
+  });
+</script>
+
+<style>
+  .liquid-controls {
+    display: flex;
+    align-items: center;
+    gap: 0.8rem;
+    margin-bottom: 1.4rem;
+    font-family: var(--mono);
+    font-size: 0.72rem;
+    color: var(--muted);
+  }
+
+  .liquid-controls input {
+    flex: 1;
+    max-width: 16rem;
+    accent-color: var(--ink);
+  }
+
+  .liquid-controls output {
+    min-width: 2ch;
+    color: var(--ink);
+  }
+
+  .liquid-controls button {
+    border: 1px solid var(--rule);
+    border-radius: 999px;
+    background: transparent;
+    padding: 0.35rem 0.75rem;
+    color: var(--muted);
+    font-family: var(--mono);
+    font-size: 0.7rem;
+    cursor: var(--cursor-hand);
+    transition: border-color 130ms ease, color 130ms ease;
+  }
+
+  .liquid-controls button:hover {
+    border-color: var(--accent);
+    color: var(--accent);
+  }
+</style>

@@ -1,0 +1,370 @@
+---
+// The photograph won and is live on /reading and the home page. This page
+// keeps the drawn shelf alive as a fallback — it builds, so it cannot rot
+// silently, and swapping back is a matter of lifting section B into a component.
+import { getCollection } from "astro:content";
+import { SCENE_ASPECT, SPINE_BOXES, SPINE_PAINT } from "../data/shelf";
+import "@fontsource-variable/bricolage-grotesque";
+import "@fontsource-variable/geist";
+import "../styles/global.css";
+
+const books = (await getCollection("reading"))
+  .filter((b) => b.data.kind === "Book")
+  .sort((a, b) => a.data.order - b.data.order);
+
+/* ---------------- A: the photograph, which is what's live ---------------- */
+
+const slices = books.flatMap((entry) => {
+  const box = SPINE_BOXES[entry.id];
+  if (!box) return [];
+  const { x, y, w, h } = box;
+  return [{
+    entry, x, y, w, h,
+    bgSize: `${10000 / w}% ${10000 / h}%`,
+    bgPos: `${(x / (100 - w)) * 100}% ${(y / (100 - h)) * 100}%`,
+  }];
+});
+
+/* ---------------- B: plain drawn spines ---------------- */
+
+/**
+ * The photo's spacing can't be reused here, because the real shelf holds two
+ * things the collection doesn't — a Tinkle digest and a book about cricket
+ * grounds. Their coordinates would leave holes, which read as missing teeth
+ * rather than as a shelf, so the spines are packed with one even gutter.
+ *
+ * Widths, heights and colours are still the measured ones, so the only thing
+ * invented is the horizontal position.
+ */
+const GUTTER = 0.12;
+const TOP = 10.0;
+const DEPTH = 76.0;
+const SCENE_RATIO = 1672 / 941;
+const MARGIN = 1.2;
+
+let cursor = MARGIN;
+const drawn = books.flatMap((entry) => {
+  const box = SPINE_BOXES[entry.id];
+  const paint = SPINE_PAINT[entry.id];
+  if (!box || !paint) return [];
+  const x = cursor;
+  cursor += box.w + GUTTER;
+  const label = `${entry.data.title} · ${entry.data.author}`;
+  return [{ entry, paint, box, x, label }];
+});
+
+const packed = cursor - GUTTER + MARGIN;
+const drawnAspect = (packed * SCENE_RATIO) / DEPTH;
+
+/** One line of type runs down each spine, so length has to set the size. */
+const sizeFor = (n: number) =>
+  n > 56 ? 2.19 : n > 48 ? 2.38 : n > 40 ? 2.57 : n > 30 ? 2.76 : 2.95;
+
+const spines = drawn.map((s) => ({
+  ...s,
+  left: (s.x / packed) * 100,
+  width: (s.box.w / packed) * 100,
+  top: ((s.box.y - TOP) / DEPTH) * 100,
+  height: (s.box.h / DEPTH) * 100,
+  fs: sizeFor(s.label.length),
+}));
+---
+
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="robots" content="noindex, nofollow" />
+    <title>Shelf: live and fallback</title>
+  </head>
+  <body>
+    <div class="ground" aria-hidden="true"></div>
+    <div class="wrap">
+      <h1>Shelf</h1>
+      <p class="lead">
+        The same books twice. Hover to pull one out, click to open it — both work in either.
+        A is what's live on <a href="/reading">/reading</a> and the home page; B is kept as a
+        fallback if the photograph ever needs replacing.
+      </p>
+
+      <section class="lab">
+        <p class="lab__tag">A — The photograph (live)</p>
+        <div class="shelf" style={`--sceneAspect:${SCENE_ASPECT}`}>
+          <img class="shelf__art" src="/images/reading-shelf.jpg" alt="" loading="eager" />
+          {slices.map((s) => (
+            <button
+              class="slice"
+              type="button"
+              style={`--x:${s.x}%; --y:${s.y}%; --w:${s.w}%; --h:${s.h}%; --bs:${s.bgSize}; --bp:${s.bgPos}`}
+              data-title={s.entry.data.title}
+              data-author={s.entry.data.author}
+              data-note={s.entry.data.note}
+              data-url={s.entry.data.url ?? ""}
+              aria-label={`${s.entry.data.title} by ${s.entry.data.author}`}
+            ></button>
+          ))}
+        </div>
+      </section>
+
+      <section class="lab">
+        <p class="lab__tag">
+          B — Drawn, plain (fallback) — no jacket art. Each spine keeps its real width, height
+          and colour, measured off the photo; the title is set in the site's own type, so it
+          carries none of the photograph's garbled lettering.
+        </p>
+        <div class="drawn" style={`--aspect:${drawnAspect}`}>
+          <div class="drawn__scene">
+            {spines.map((b) => (
+              <button
+                class="drawn__spine"
+                type="button"
+                data-ink={b.paint.ink}
+                style={`--x:${b.left}%; --y:${b.top}%; --w:${b.width}%; --h:${b.height}%; --top:${b.paint.top}; --bottom:${b.paint.bottom}; --fs:${b.fs}cqh`}
+                data-title={b.entry.data.title}
+                data-author={b.entry.data.author}
+                data-note={b.entry.data.note}
+                data-url={b.entry.data.url ?? ""}
+                aria-label={`${b.entry.data.title} by ${b.entry.data.author}`}
+              >
+                <span class="drawn__body">
+                  <span class="drawn__label" aria-hidden="true">
+                    <span class="drawn__title">{b.entry.data.title}</span>
+                    <span class="drawn__author">{b.entry.data.author}</span>
+                  </span>
+                </span>
+              </button>
+            ))}
+            <div class="drawn__board" aria-hidden="true"></div>
+          </div>
+        </div>
+      </section>
+    </div>
+
+    <dialog id="book-dialog" class="book-dialog" aria-labelledby="book-dialog-title">
+      <div class="book-dialog__panel">
+        <p class="book-dialog__kicker">From the shelf</p>
+        <h2 id="book-dialog-title"></h2>
+        <p class="book-dialog__author"></p>
+        <p class="book-dialog__note"></p>
+        <a class="book-dialog__link" href="#" target="_blank" rel="noreferrer" hidden>
+          Find it <span aria-hidden="true">↗</span>
+        </a>
+        <button class="book-dialog__close" type="button">Close <span aria-hidden="true">×</span></button>
+      </div>
+    </dialog>
+
+    <style>
+      .wrap { width: min(100% - 3rem, 62rem); margin: 3rem auto 5rem; }
+      h1 { margin: 0; font-family: var(--display); font-weight: 600; font-size: 1.7rem; letter-spacing: -0.03em; }
+      .lead { max-width: 64ch; color: var(--muted); font-size: 0.9rem; }
+      .lab { border-top: 1px solid var(--rule); padding-block: 1.6rem 2rem; }
+      .lab__tag { max-width: 70ch; margin: 0 0 1.2rem; color: var(--muted); font-family: var(--mono); font-size: 0.68rem; line-height: 1.6; letter-spacing: 0.05em; text-transform: uppercase; }
+
+      /* ---------------- A: photo ---------------- */
+      .shelf {
+        position: relative;
+        aspect-ratio: var(--sceneAspect);
+        overflow: hidden;
+        border: 1px solid var(--rule);
+        border-radius: 10px;
+        background: #ececeb;
+      }
+      .shelf__art { display: block; width: 100%; height: 100%; object-fit: cover; }
+
+      /* The button is only a hit area and never moves; the painted slice does.
+         Putting the lift on the button slid it out from under the cursor, so
+         hover flickered and clicks never landed. */
+      .slice {
+        position: absolute;
+        left: var(--x);
+        top: var(--y);
+        box-sizing: border-box;
+        width: var(--w);
+        height: var(--h);
+        padding: 0;
+        border: 0;
+        background: transparent;
+        cursor: var(--cursor-hand);
+      }
+
+      .slice::before {
+        content: "";
+        position: absolute;
+        inset: 0;
+        border-radius: 2px;
+        background-image: url("/images/reading-shelf.jpg");
+        background-repeat: no-repeat;
+        background-size: var(--bs);
+        background-position: var(--bp);
+        opacity: 0;
+        transform-origin: bottom center;
+        transition: transform 260ms var(--ease), opacity 160ms ease, box-shadow 260ms ease;
+      }
+
+      .slice:hover::before,
+      .slice:focus-visible::before {
+        opacity: 1;
+        transform: translateY(-7.5%) scale(1.03);
+        box-shadow:
+          0 3px 0 0 rgba(60, 55, 48, 0.34),
+          0 10px 14px -4px rgba(40, 36, 30, 0.4),
+          0 20px 28px -10px rgba(40, 36, 30, 0.28);
+      }
+      .slice:focus-visible { outline: 2px solid var(--ink); outline-offset: 2px; }
+
+      /* ---------------- B: drawn ---------------- */
+      .drawn {
+        display: flex;
+        justify-content: center;
+        overflow: hidden;
+        border-radius: 10px;
+        background:
+          radial-gradient(120% 90% at 50% 108%, var(--bloom-amber), transparent 70%),
+          var(--page);
+        padding: 1.7rem 1.2rem 2.1rem;
+      }
+
+      .drawn__scene {
+        position: relative;
+        height: clamp(15rem, 42vw, 21rem);
+        aspect-ratio: var(--aspect);
+        container-type: size;
+      }
+
+      .drawn__spine {
+        position: absolute;
+        left: var(--x);
+        top: var(--y);
+        box-sizing: border-box;
+        width: var(--w);
+        height: var(--h);
+        padding: 0;
+        border: 0;
+        background: transparent;
+        cursor: var(--cursor-hand);
+      }
+
+      .drawn__body {
+        display: grid;
+        place-items: center;
+        width: 100%;
+        height: 100%;
+        padding: 4cqh 0 3.6cqh;
+        box-sizing: border-box;
+        border-radius: 1px 2px 0 0;
+        background: linear-gradient(var(--top), var(--bottom));
+        transform-origin: bottom center;
+        transition: transform 260ms var(--ease), box-shadow 260ms ease;
+        box-shadow:
+          inset 0.055rem 0 0 rgba(255, 255, 255, 0.3),
+          inset -0.07rem 0 0.14rem rgba(0, 0, 0, 0.24),
+          0 2px 5px -3px rgba(20, 18, 14, 0.55);
+      }
+
+      .drawn__label {
+        display: block;
+        max-height: 100%;
+        overflow: hidden;
+        color: #fbf9f5;
+        font-family: var(--sans);
+        font-size: var(--fs);
+        line-height: 1.1;
+        white-space: nowrap;
+        writing-mode: vertical-rl;
+        transform: rotate(180deg);
+      }
+      .drawn__spine[data-ink="dark"] .drawn__label { color: #1c1a17; }
+      .drawn__title { font-weight: 500; letter-spacing: 0.005em; }
+      .drawn__author { font-weight: 400; opacity: 0.66; }
+      .drawn__author::before { content: "  ·  "; }
+
+      .drawn__board {
+        position: absolute;
+        right: -1.6%;
+        bottom: -1.9%;
+        left: -1.6%;
+        height: 4px;
+        border-radius: 2px;
+        background: color-mix(in srgb, var(--ink) 20%, transparent);
+        box-shadow: 0 7px 16px -9px rgba(20, 18, 14, 0.5);
+      }
+
+      @media (hover: hover) and (pointer: fine) {
+        .drawn__spine:hover .drawn__body {
+          transform: translateY(-7.5%) scale(1.02);
+          box-shadow:
+            inset 0.055rem 0 0 rgba(255, 255, 255, 0.4),
+            inset -0.07rem 0 0.14rem rgba(0, 0, 0, 0.24),
+            0 10px 14px -6px rgba(20, 18, 14, 0.55);
+        }
+      }
+      .drawn__spine:focus-visible { outline: 2px solid var(--ink); outline-offset: 3px; }
+
+      @media (prefers-reduced-motion: reduce) {
+        .drawn__spine:hover .drawn__body { transform: none; }
+      }
+
+      /* ---------------- the opened book ---------------- */
+      .book-dialog {
+        width: min(92vw, 28rem);
+        max-width: none;
+        padding: 0;
+        border: 1px solid var(--rule-strong);
+        border-radius: 12px;
+        background: var(--page);
+        color: var(--ink);
+        box-shadow: 0 2rem 5rem -1.5rem rgba(20, 18, 14, 0.35);
+      }
+      .book-dialog::backdrop { background: rgba(24, 22, 18, 0.5); backdrop-filter: blur(3px); }
+      .book-dialog[open] { animation: book-pop 200ms var(--ease); }
+      .book-dialog[open]::backdrop { animation: book-fade 200ms ease; }
+      @keyframes book-pop { from { opacity: 0; transform: translateY(8px) scale(0.97); } }
+      @keyframes book-fade { from { opacity: 0; } }
+      @media (prefers-reduced-motion: reduce) {
+        .book-dialog[open], .book-dialog[open]::backdrop { animation: none; }
+      }
+
+      .book-dialog__panel { padding: 1.4rem 1.5rem 1.5rem; }
+      .book-dialog__kicker { margin: 0; color: var(--faint); font-family: var(--mono); font-size: 0.66rem; letter-spacing: 0.14em; text-transform: uppercase; }
+      .book-dialog h2 { margin: 0.55rem 0 0; font-family: var(--display); font-size: 1.5rem; font-weight: 600; letter-spacing: -0.025em; line-height: 1.15; text-wrap: balance; }
+      .book-dialog__author { margin: 0.3rem 0 0; color: var(--muted); font-size: 0.88rem; }
+      .book-dialog__note { margin: 1rem 0 0; color: var(--muted); font-size: 0.94rem; line-height: 1.65; text-wrap: pretty; }
+      .book-dialog__link[hidden] { display: none; }
+      .book-dialog__link { display: inline-block; margin: 1.1rem 0 0; color: var(--ink); font-size: 0.85rem; font-weight: 500; text-underline-offset: 0.22em; }
+      .book-dialog__close { display: block; margin: 1.3rem 0 0; border: 1px solid var(--rule); border-radius: 999px; background: transparent; padding: 0.4rem 0.8rem; font-family: var(--mono); font-size: 0.72rem; cursor: var(--cursor-hand); transition: border-color 130ms ease; }
+      .book-dialog__close:hover { border-color: var(--ink); }
+    </style>
+
+    <script>
+      const dialog = document.querySelector<HTMLDialogElement>("#book-dialog");
+      const title = dialog?.querySelector<HTMLElement>("#book-dialog-title");
+      const author = dialog?.querySelector<HTMLElement>(".book-dialog__author");
+      const note = dialog?.querySelector<HTMLElement>(".book-dialog__note");
+      const link = dialog?.querySelector<HTMLAnchorElement>(".book-dialog__link");
+      const close = dialog?.querySelector<HTMLButtonElement>(".book-dialog__close");
+
+      document.querySelectorAll<HTMLButtonElement>("[data-title]").forEach((spine) => {
+        spine.addEventListener("click", () => {
+          if (!dialog || !title || !author || !note || !link) return;
+          title.textContent = spine.dataset.title ?? "";
+          author.textContent = spine.dataset.author ?? "";
+          note.textContent = spine.dataset.note ?? "";
+          const url = spine.dataset.url;
+          if (url) {
+            link.href = url;
+            link.hidden = false;
+          } else {
+            link.hidden = true;
+          }
+          dialog.showModal();
+        });
+      });
+
+      close?.addEventListener("click", () => dialog?.close());
+      dialog?.addEventListener("click", (event) => {
+        if (event.target === dialog) dialog.close();
+      });
+    </script>
+  </body>
+</html>

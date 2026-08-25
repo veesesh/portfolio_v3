@@ -1,0 +1,146 @@
+---
+/**
+ * Two ways to sit a pixel icon beside a page heading, so they can be compared
+ * before either goes near a real page.
+ *
+ * A — shrink the icon to the heading. The h1 keeps the size it has everywhere
+ *     on the site today; the icon is 2× (28px of ink), which lands within a
+ *     couple of pixels of the cap height of the type next to it.
+ * B — grow the heading to the icon. The icon is 3× (42px of ink) and the h1
+ *     grows to match, so the pair reads as one larger object.
+ *
+ * Both use `align-items: center`, which is not a fudge: with this face at
+ * line-height 1.03 the cap centre and the line-box centre land within a
+ * fraction of a pixel of each other, so centring *is* cap alignment.
+ */
+import BaseLayout from "../layouts/BaseLayout.astro";
+
+const heads = [
+  { section: "Build", copy: null },
+  { section: "Reading", copy: "Occasionally I write and mediocrely I read books. Some of these are below:" },
+  { section: "Listening", copy: "A small, current corner of the internet for what has been in rotation lately." },
+  { section: "Pictures", copy: "A random photo gallery of events: rooms full of builders, and the people who made them worth showing up for." },
+];
+---
+
+<BaseLayout title="Pixel head lab" description="Two sizings for a pixel icon beside a page heading.">
+  <header class="page-head column">
+    <h1>Pixel head lab</h1>
+    <p>
+      The same four headings, sized two ways. A keeps your current heading size and shrinks the
+      icon to it. B grows the heading to a larger icon. Every icon inks exactly 14 rows, so within
+      a variant they are all the same height.
+    </p>
+  </header>
+
+  {[
+    { id: "a", label: "A — icon shrinks to the heading", scale: 2 },
+    { id: "b", label: "B — heading grows to the icon", scale: 3 },
+  ].map((variant) => (
+    <section class="section column" aria-labelledby={`variant-${variant.id}`}>
+      <div class="section-head">
+        <h2 id={`variant-${variant.id}`}>{variant.label}</h2>
+        <span class="meta">{variant.scale}× · {variant.scale * 14}px of ink</span>
+      </div>
+
+      <div class:list={["heads", `heads--${variant.id}`]}>
+        {heads.map((head) => (
+          <div class="head-demo">
+            <div class="head-demo__line">
+              <h3>{head.section}</h3>
+              <span
+                class="head-icon"
+                data-sprite={head.section}
+                data-scale={variant.scale}
+                aria-hidden="true"
+              ></span>
+            </div>
+            {head.copy && <p class="head-demo__copy">{head.copy}</p>}
+          </div>
+        ))}
+      </div>
+    </section>
+  ))}
+</BaseLayout>
+
+<script>
+  import { PixelField } from "../scripts/pixel-field";
+  import { pixelSprites } from "../data/pixel-sprites";
+
+  const reduced = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+
+  document.querySelectorAll<HTMLElement>(".head-icon").forEach((slot) => {
+    const sprite = pixelSprites.find((s) => s.section === slot.dataset.sprite);
+    const scale = Number(slot.dataset.scale);
+    if (!sprite || !scale) return;
+
+    // The stage is the full 16×16 box, not just the inked part — pixels shoved
+    // off the sprite need somewhere to land, and clipping them would make the
+    // effect look broken at the edges.
+    slot.style.width = `${16 * scale}px`;
+    slot.style.height = `${16 * scale}px`;
+    new PixelField(slot, { sprite, reduced, scale });
+  });
+</script>
+
+<style>
+  .heads {
+    display: flex;
+    flex-direction: column;
+    gap: 2.6rem;
+  }
+
+  .head-demo__line {
+    display: flex;
+    align-items: center;
+    gap: 0.7rem;
+  }
+
+  .head-demo h3 {
+    margin: 0;
+    color: var(--ink);
+    font-family: var(--display);
+    font-weight: 600;
+    letter-spacing: -0.032em;
+    line-height: 1.03;
+  }
+
+  /* A: today's page-head size, unchanged. */
+  .heads--a h3 {
+    font-size: clamp(1.9rem, 5vw, 2.6rem);
+  }
+
+  /* B: grown so its cap height meets a 3× icon. */
+  .heads--b h3 {
+    font-size: clamp(2.4rem, 6.5vw, 3.6rem);
+  }
+
+  .heads--b .head-demo__line {
+    gap: 0.9rem;
+  }
+
+  .head-icon {
+    display: block;
+    position: relative;
+    flex: none;
+    cursor: crosshair;
+    touch-action: none;
+  }
+
+  .head-icon :global(.pixel-field__canvas) {
+    position: absolute;
+    inset: 0;
+    display: block;
+    width: 100%;
+    height: 100%;
+  }
+
+  .head-demo__copy {
+    max-width: 62ch;
+    margin: 0.9rem 0 0;
+    color: var(--muted);
+    font-size: 0.98rem;
+    line-height: 1.65;
+    text-wrap: pretty;
+  }
+</style>

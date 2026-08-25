@@ -1,5 +1,6 @@
 /**
- * Hover sound. Opt-in, off by default, remembered in localStorage.
+ * Hover sound. On by default, with no control widget — hovering things on this
+ * site makes a noise, and that is the intent.
  *
  * Two voices, so signature interactions don't sound like the furniture:
  *
@@ -10,13 +11,11 @@
  * - `blip` — a bright triangle sliding down a minor third. Reserved for the
  *   name reveal, which earns a sound of its own.
  *
- * Browsers refuse to start an AudioContext before a user gesture, so the engine
- * also arms itself on the first click or keypress. That means a visitor who
- * enabled sound in an earlier session gets it from their first click onward,
- * without the toggle having to be touched again.
+ * Browsers refuse to start an AudioContext until the visitor has interacted
+ * with the page, so the engine arms itself on the first click, key press or
+ * touch. Hovers before that are silently skipped — there is no way around it,
+ * and nothing to fix if the first hover of a fresh load is quiet.
  */
-
-const STORAGE_KEY = "vee-sound";
 
 type Voice = { kind: "thud" | "blip"; freq: number };
 
@@ -24,7 +23,6 @@ const VOICES: Record<string, Voice> = {
   nav: { kind: "thud", freq: 190 },
   row: { kind: "thud", freq: 150 },
   head: { kind: "thud", freq: 116 },
-  toggle: { kind: "thud", freq: 205 },
   name: { kind: "blip", freq: 880 },
 };
 
@@ -35,27 +33,11 @@ const BODY_GAIN = 0.075;
 const KNOCK_GAIN = 0.03;
 const BODY_MS = 0.1;
 
-let enabled = false;
 let ctx: AudioContext | null = null;
 let noiseBuffer: AudioBuffer | null = null;
+let armed = false;
 let lastAt = 0;
 let lastTarget: Element | null = null;
-
-function readPreference(): boolean {
-  try {
-    return localStorage.getItem(STORAGE_KEY) === "on";
-  } catch {
-    return false;
-  }
-}
-
-function writePreference(value: boolean) {
-  try {
-    localStorage.setItem(STORAGE_KEY, value ? "on" : "off");
-  } catch {
-    /* private mode — works for the session, just isn't remembered */
-  }
-}
 
 function audio(): AudioContext | null {
   if (!ctx) {
@@ -142,7 +124,7 @@ function blip(freq: number, level = 1) {
 }
 
 function play(voice: string) {
-  if (!enabled) return;
+  if (!armed) return;
   const now = performance.now();
   if (now - lastAt < MIN_GAP_MS) return;
   lastAt = now;
@@ -153,37 +135,26 @@ function play(voice: string) {
 
 /** Unlock the AudioContext on the first real gesture, whatever it is. */
 function arm() {
-  if (enabled) audio();
+  armed = true;
+  audio();
+  window.removeEventListener("pointerdown", arm);
+  window.removeEventListener("keydown", arm);
+  window.removeEventListener("touchstart", arm);
 }
 
-export function mountSound(button: HTMLButtonElement) {
-  const finePointer = window.matchMedia("(hover: hover) and (pointer: fine)");
-
-  enabled = readPreference();
-  button.setAttribute("aria-pressed", String(enabled));
-  button.setAttribute("aria-label", enabled ? "Turn hover sound off" : "Turn hover sound on");
-
-  button.addEventListener("click", () => {
-    enabled = !enabled;
-    writePreference(enabled);
-    button.setAttribute("aria-pressed", String(enabled));
-    button.setAttribute("aria-label", enabled ? "Turn hover sound off" : "Turn hover sound on");
-    // Confirm the new state audibly — this click is also the gesture that
-    // unlocks the AudioContext.
-    if (enabled) thud(VOICES.toggle.freq, 1.15);
-  });
-
+export function mountSound() {
   window.addEventListener("pointerdown", arm, { once: true, passive: true });
   window.addEventListener("keydown", arm, { once: true });
+  window.addEventListener("touchstart", arm, { once: true, passive: true });
 
-  if (!finePointer.matches) return;
+  // Hover sound needs something that can actually hover.
+  if (!window.matchMedia("(hover: hover) and (pointer: fine)").matches) return;
 
   // Delegated, so anything carrying data-sfx works — including markup added
   // after mount — with one listener instead of dozens.
   document.addEventListener(
     "pointerover",
     (event) => {
-      if (!enabled) return;
       const target = (event.target as Element | null)?.closest("[data-sfx]");
       if (!target || target === lastTarget) return;
       lastTarget = target;

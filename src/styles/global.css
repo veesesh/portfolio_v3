@@ -1,3 +1,7 @@
+/* Cursor tokens and their SVGs are generated together — see
+   tools/make-cursors.mjs, and `npm run cursors` to change their size. */
+@import "./cursors.css";
+
 /* ------------------------------------------------------------------
    Tokens
    Three colours, on purpose: one ground and two text weights. Rules,
@@ -52,6 +56,7 @@
   --wide: min(100% - 2.5rem, 60rem);
 
   --ease: cubic-bezier(0.22, 0.61, 0.36, 1);
+
 }
 
 @font-face {
@@ -88,6 +93,7 @@ html {
 body {
   margin: 0;
   min-width: 320px;
+  cursor: var(--cursor-arrow);
   overflow-x: hidden;
   background: transparent;
   color: var(--ink);
@@ -158,49 +164,6 @@ body {
   transition: background 80ms linear;
 }
 
-/* Hover-sound switch. Sits beside the footer links; the crossed-out speaker is
-   the resting state, since sound is off until asked for. */
-.sound-toggle {
-  display: grid;
-  place-items: center;
-  width: 28px;
-  height: 28px;
-  padding: 0;
-  border: 1px solid var(--rule);
-  border-radius: 999px;
-  background: transparent;
-  color: var(--faint);
-  cursor: pointer;
-  transition: color 130ms ease, border-color 130ms ease;
-}
-
-.sound-toggle:hover {
-  color: var(--ink);
-  border-color: var(--rule-strong);
-}
-
-.sound-toggle[aria-pressed="true"] {
-  color: var(--ink);
-  border-color: var(--rule-strong);
-}
-
-.sound-toggle svg {
-  width: 14px;
-  height: 14px;
-}
-
-.sound-toggle .sound-on {
-  display: none;
-}
-
-.sound-toggle[aria-pressed="true"] .sound-on {
-  display: block;
-}
-
-.sound-toggle[aria-pressed="true"] .sound-off {
-  display: none;
-}
-
 .rainbow-toggle {
   display: inline-flex;
   align-items: center;
@@ -211,7 +174,7 @@ body {
   color: var(--muted);
   font-family: var(--mono);
   font-size: 0.72rem;
-  cursor: pointer;
+  cursor: var(--cursor-hand);
   transition: color 130ms ease;
 }
 
@@ -667,6 +630,36 @@ button {
 /* ------------------------------------------------------------------
    Footer
 ------------------------------------------------------------------ */
+/*
+ * A deliberate run of empty space before the footer, so content can be scrolled
+ * up to a comfortable eyeline instead of stopping dead at the fold. The padding
+ * is the feature; the note is there to explain it rather than leave it looking
+ * like a layout bug.
+ */
+.blank-space {
+  padding-block: clamp(12rem, 38vh, 24rem) 0;
+  text-align: center;
+}
+
+.blank-space__mark {
+  margin: 0;
+  color: var(--faint);
+  font-family: var(--mono);
+  font-size: 0.74rem;
+  letter-spacing: 0.02em;
+}
+
+.blank-space__note {
+  /* No max-width: the column already bounds it, and 48ch broke the sentence
+     across two uneven lines on desktop. */
+  margin: 0.5rem auto 0;
+  color: var(--faint);
+  font-size: 0.82rem;
+  font-style: italic;
+  line-height: 1.55;
+  text-wrap: pretty;
+}
+
 .site-footer {
   border-top: 1px solid var(--rule);
   padding-block: 2.5rem 4rem;
@@ -760,7 +753,7 @@ button {
    Page headers
 ------------------------------------------------------------------ */
 .page-head {
-  padding-block: clamp(1.5rem, 5vw, 3rem) clamp(1.5rem, 4vw, 2.5rem);
+  padding-block: clamp(1.5rem, 5vw, 3rem) clamp(1.1rem, 2.6vw, 1.6rem);
 }
 
 .page-head h1 {
@@ -773,7 +766,7 @@ button {
 }
 
 .page-head p {
-  max-width: 46ch;
+  max-width: 62ch;
   margin: 0.9rem 0 0;
   color: var(--muted);
   font-size: 0.98rem;
@@ -842,4 +835,269 @@ button {
 .prose a {
   color: var(--accent);
   text-underline-offset: 0.2em;
+}
+
+/* ------------------------------------------------------------------
+   Note — a whole page written as markdown (the Build page)
+   Not scoped, for the same reason as .prose: this styles HTML rendered
+   from markdown at runtime.
+
+   The hierarchy is the note's own — h2 for the two halves of the work,
+   h3 for a section, h4 for a heading inside one — so the sizes below
+   only have to keep three levels apart from each other and from body
+   text. Nesting is carried by indentation alone — no rules, no guides.
+------------------------------------------------------------------ */
+.note {
+  color: var(--muted);
+  font-size: 1rem;
+  line-height: 1.75;
+}
+
+.note > :first-child {
+  margin-top: 0;
+}
+
+.note > :last-child {
+  margin-bottom: 0;
+}
+
+.note h2 {
+  margin: clamp(2.75rem, 6vw, 3.75rem) 0 1.25rem;
+  padding-top: clamp(2.5rem, 6vw, 3.5rem);
+  border-top: 1px solid var(--rule-strong);
+  color: var(--ink);
+  font-family: var(--display);
+  font-size: clamp(1.5rem, 3.4vw, 1.9rem);
+  font-weight: 600;
+  letter-spacing: -0.03em;
+  line-height: 1.1;
+}
+
+.note > h2:first-child {
+  margin-top: 0;
+  padding-top: 0;
+  border-top: 0;
+}
+
+.note h3 {
+  margin: clamp(2rem, 4.5vw, 2.75rem) 0 0.9rem;
+  color: var(--ink);
+  font-family: var(--display);
+  font-size: clamp(1.15rem, 2.4vw, 1.3rem);
+  font-weight: 600;
+  letter-spacing: -0.025em;
+  line-height: 1.25;
+}
+
+.note h4 {
+  margin: 1.6rem 0 0.7rem;
+  color: var(--ink);
+  font-family: var(--sans);
+  font-size: 0.98rem;
+  font-weight: 600;
+  letter-spacing: -0.01em;
+}
+
+.note p {
+  max-width: 62ch;
+  margin: 0 0 1.15rem;
+  text-wrap: pretty;
+}
+
+.note strong {
+  color: var(--ink);
+  font-weight: 600;
+}
+
+.note ul {
+  margin: 0 0 1.15rem;
+  padding-left: 1.3rem;
+  list-style: none;
+}
+
+.note li {
+  position: relative;
+  max-width: 60ch;
+  text-wrap: pretty;
+}
+
+.note li + li {
+  margin-top: 0.5rem;
+}
+
+/* The dot is drawn rather than a list marker, so its colour and size can
+   sit down relative to the text instead of competing with it. */
+.note li::before {
+  content: "";
+  position: absolute;
+  top: 0.72em;
+  left: -0.95rem;
+  width: 4px;
+  height: 4px;
+  border-radius: 50%;
+  background: var(--rule-strong);
+}
+
+/* A nested list belongs to the line above it, so it tucks under that line.
+   Indentation carries the nesting on its own. */
+.note li > ul {
+  margin: 0.5rem 0 0;
+  padding-left: 1.15rem;
+}
+
+.note a {
+  color: var(--accent);
+  text-underline-offset: 0.2em;
+}
+
+/* Matches the ↗ used on every other external link on the site. The plugin in
+   astro.config.mjs sets the target and adds the screen-reader text. */
+.note a[target="_blank"]::after {
+  content: "↗";
+  margin-left: 0.15em;
+  font-size: 0.82em;
+  text-decoration: none;
+  vertical-align: 0.08em;
+}
+
+/* ------------------------------------------------------------------
+   Page heading icon
+   The canvas is created by the pixel engine and never carries Astro's
+   scope attribute, so these rules have to live out here.
+
+   Centring is cap alignment for this face: at line-height 1.03 the cap
+   centre and the line-box centre both land at ~0.515em from the top of
+   the line, so `align-items: center` puts the sprite on the caps.
+------------------------------------------------------------------ */
+.page-head__line {
+  display: flex;
+  align-items: center;
+  gap: 0.7rem;
+}
+
+/* Reserved up front so the heading doesn't shift when the engine sizes the
+   canvas. The box is the full 16×16 sprite, not just its inked rows — pixels
+   shoved off the icon need somewhere to land, and clipping them would make the
+   effect look broken at the edges. Sizes are 16 × HEAD_SCALES (see
+   scripts/pixel-field.ts); keep the two in step. */
+.page-head__icon {
+  position: relative;
+  display: block;
+  flex: none;
+  cursor: crosshair;
+  touch-action: none;
+}
+
+/* a — the icon comes down to the heading. */
+.page-head__line--a .page-head__icon {
+  width: 32px;
+  height: 32px;
+}
+
+/* b — the icon leads and the heading grows to meet it. The type scales by the
+   same 3:2 as the sprite, so the pair keeps its proportions. */
+.page-head__line--b {
+  gap: 0.9rem;
+}
+
+.page-head__line--b h1 {
+  font-size: clamp(2.4rem, 6.5vw, 3.6rem);
+}
+
+.page-head__line--b .page-head__icon {
+  width: 48px;
+  height: 48px;
+}
+
+.page-head__icon canvas {
+  position: absolute;
+  inset: 0;
+  display: block;
+  width: 100%;
+  height: 100%;
+}
+
+/* Anything clickable that never set a cursor for itself. */
+a,
+button,
+summary,
+label,
+select,
+[role="button"] {
+  cursor: var(--cursor-hand);
+}
+
+/* ------------------------------------------------------------------
+   Liquid surface
+   Cards poured into one shape. These rules are global because the cards
+   are slotted in from whichever page uses the surface, and slotted
+   content keeps its own page's scope rather than the component's —
+   scoped styles in LiquidSurface would never reach them.
+------------------------------------------------------------------ */
+.liquid {
+  position: relative;
+  touch-action: none;
+}
+
+.liquid__paint {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+}
+
+/* No border and no background: the generated shape underneath is the surface.
+   A card is only ever its content and its hit area. */
+.liquid-card {
+  position: absolute;
+  top: 0;
+  left: 0;
+  padding: clamp(1.2rem, 3vw, 1.8rem);
+}
+
+.liquid--draggable .liquid-card {
+  cursor: grab;
+}
+
+.liquid--draggable .liquid-card[data-dragging] {
+  cursor: grabbing;
+}
+
+.liquid-card:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 4px;
+  border-radius: 9px;
+}
+
+/* ------------------------------------------------------------------
+   Pictures banner
+   The heading inside the drifting field runs much larger than a normal
+   page head, and its line centres rather than sitting left. Global
+   because the heading is slotted into PhotoGalaxy from the page.
+------------------------------------------------------------------ */
+.galaxy-head .page-head__line {
+  justify-content: center;
+  gap: clamp(0.7rem, 2vw, 1.2rem);
+}
+
+.galaxy-head .page-head__line h1 {
+  font-size: clamp(2.4rem, 8vw, 5rem);
+  letter-spacing: -0.035em;
+  line-height: 1;
+}
+
+/* The field runs behind the words, so they need a ground of their own to stay
+   readable when a photograph drifts under them. */
+.galaxy-head h1,
+.galaxy-head p {
+  text-shadow:
+    0 0 12px var(--page),
+    0 0 28px var(--page);
+}
+
+/* ------------------------------------------------------------------
+   Footer reach-out
+------------------------------------------------------------------ */
+.footer-hello {
+  margin-top: 0.4rem !important;
+  font-size: 0.92rem;
 }

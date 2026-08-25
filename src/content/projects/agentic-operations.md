@@ -4,7 +4,7 @@ org: "devfolio"
 descriptor: "Builder and daily operator"
 summary: "Turning repeated support and community judgment into grounded, human-reviewed workflows — from inbox triage and knowledge retrieval to editorial automation."
 year: "2025 — now"
-order: 2
+order: 1
 category: "system"
 featured: true
 links:

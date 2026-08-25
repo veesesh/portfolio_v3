@@ -1,0 +1,149 @@
+---
+/**
+ * A bench for the pixel-icon idea. Nothing links here and nothing on the real
+ * sections uses it yet — the point is to see whether it belongs at all.
+ *
+ * One icon per section, each a 16×16 sprite you can shove around with the
+ * cursor and which heals back on its own. Sound is synthesised per icon.
+ */
+import BaseLayout from "../layouts/BaseLayout.astro";
+import { pixelSprites } from "../data/pixel-sprites";
+---
+
+<BaseLayout title="Pixel lab" description="Pixel-art section icons that the cursor can physically disturb.">
+  <header class="page-head column">
+    <h1>Pixel lab</h1>
+    <p>
+      One 16×16 icon per section. Drag the cursor across a sprite to shove its pixels around and
+      heat them; let go and it reassembles itself. Click to scatter the whole thing. Each has its
+      own synthesised sound.
+    </p>
+  </header>
+
+  <section class="section column" aria-labelledby="pixel-icons">
+    <div class="section-head">
+      <h2 id="pixel-icons">Four sections</h2>
+      <label class="pixel-mute">
+        <input type="checkbox" id="pixel-mute" /> mute
+      </label>
+    </div>
+
+    <ul class="pixel-grid">
+      {pixelSprites.map((sprite) => (
+        <li class="pixel-cell">
+          <div class="pixel-field" data-sprite={sprite.section} aria-hidden="true"></div>
+          <p class="meta">{sprite.section}</p>
+          <p class="pixel-cell__label">{sprite.label}</p>
+        </li>
+      ))}
+    </ul>
+
+    <p class="pixel-hint">
+      Sprites are text, not images — see <code>src/data/pixel-sprites.ts</code>. Every sound is
+      synthesised the way <code>src/scripts/sound.ts</code> already does it, so there are no audio
+      files to ship.
+    </p>
+  </section>
+</BaseLayout>
+
+<script>
+  import { PixelField, setPixelMuted } from "../scripts/pixel-field";
+  import { pixelSprites } from "../data/pixel-sprites";
+
+  const reduced = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+  const stages = document.querySelectorAll<HTMLElement>(".pixel-field");
+
+  stages.forEach((stage) => {
+    const sprite = pixelSprites.find((s) => s.section === stage.dataset.sprite);
+    if (sprite) new PixelField(stage, { sprite, reduced });
+  });
+
+  const mute = document.getElementById("pixel-mute") as HTMLInputElement | null;
+  mute?.addEventListener("change", () => setPixelMuted(mute.checked));
+</script>
+
+<style>
+  .pixel-mute {
+    display: flex;
+    align-items: center;
+    gap: 0.4rem;
+    color: var(--muted);
+    font-family: var(--mono);
+    font-size: 0.72rem;
+    cursor: var(--cursor-hand);
+  }
+
+  .pixel-mute input {
+    accent-color: var(--ink);
+  }
+
+  .pixel-grid {
+    display: grid;
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+    gap: 0.7rem;
+    margin: 0;
+    padding: 0;
+    list-style: none;
+  }
+
+  .pixel-cell {
+    border: 1px solid var(--rule);
+    border-radius: 9px;
+    padding: 1rem 1rem 1.1rem;
+    text-align: center;
+  }
+
+  /* The stage is square and generous: the sprite is scaled to a whole multiple
+     of 16, so a bigger box means bigger blocks rather than a bigger picture. */
+  .pixel-field {
+    position: relative;
+    aspect-ratio: 1;
+    width: 100%;
+    margin-bottom: 0.7rem;
+    cursor: crosshair;
+    touch-action: none;
+  }
+
+  /* The canvas is created by the engine, so it never carries Astro's scope
+     attribute — this has to be global to reach it. Its width/height attributes
+     are in device pixels; without a CSS size it would lay out at that size. */
+  .pixel-field :global(.pixel-field__canvas) {
+    position: absolute;
+    inset: 0;
+    display: block;
+    width: 100%;
+    height: 100%;
+  }
+
+  .pixel-cell .meta {
+    margin: 0;
+  }
+
+  .pixel-cell__label {
+    margin: 0.2rem 0 0;
+    color: var(--ink);
+    font-family: var(--display);
+    font-size: 1.05rem;
+    font-weight: 600;
+    letter-spacing: -0.02em;
+  }
+
+  .pixel-hint {
+    max-width: 62ch;
+    margin: 1.6rem 0 0;
+    color: var(--faint);
+    font-size: 0.8rem;
+    line-height: 1.6;
+  }
+
+  .pixel-hint code {
+    font-family: var(--mono);
+    font-size: 0.92em;
+  }
+
+  @media (max-width: 640px) {
+    .pixel-grid {
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+  }
+</style>

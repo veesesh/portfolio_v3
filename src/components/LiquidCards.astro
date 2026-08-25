@@ -1,0 +1,79 @@
+---
+/** The life sections, poured into one surface. */
+import LiquidSurface from "./LiquidSurface.astro";
+import type { LifeSection } from "../data/site";
+
+interface Props {
+  sections: readonly LifeSection[];
+  controls?: boolean;
+}
+
+const { sections, controls = false } = Astro.props;
+
+const idFor = (title: string) => title.toLowerCase().replaceAll(" ", "-");
+---
+
+<LiquidSurface cardHeight={250} controls={controls}>
+  {sections.map((section) => (
+    <article class="liquid-card" id={idFor(section.title)} tabindex="0" data-liquid-card>
+      <p class="meta">{section.eyebrow}</p>
+      <h2>{section.title}</h2>
+      <p class="liquid-card__note">{section.note}</p>
+      {section.link && (
+        <a
+          class="liquid-card__link"
+          href={section.link.href}
+          data-sfx="nav"
+          target="_blank"
+          rel="noreferrer"
+        >
+          {section.link.label} <span aria-hidden="true">↗</span>
+          <span class="sr-only"> (opens in a new tab)</span>
+        </a>
+      )}
+    </article>
+  ))}
+</LiquidSurface>
+
+<style>
+  .liquid-card {
+    display: flex;
+    flex-direction: column;
+  }
+
+  .liquid-card :global(.meta),
+  .liquid-card p {
+    margin: 0;
+  }
+
+  .liquid-card h2 {
+    margin: 0.45rem 0 0.75rem;
+    color: var(--ink);
+    font-family: var(--display);
+    font-size: 1.45rem;
+    font-weight: 600;
+    letter-spacing: -0.025em;
+  }
+
+  .liquid-card__note {
+    color: var(--muted);
+    line-height: 1.6;
+  }
+
+  /* Sits at the foot of the card so the four line up, however long the note. */
+  .liquid-card__link {
+    display: inline-block;
+    margin-top: auto;
+    padding-top: 1rem;
+    color: var(--accent);
+    font-family: var(--mono);
+    font-size: 0.72rem;
+    text-decoration: none;
+    border-bottom: 1px solid transparent;
+    transition: border-color 130ms ease;
+  }
+
+  .liquid-card__link:hover {
+    border-bottom-color: var(--accent);
+  }
+</style>

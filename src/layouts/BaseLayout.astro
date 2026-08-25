@@ -3,7 +3,7 @@ import "@fontsource-variable/bricolage-grotesque";
 import "@fontsource-variable/geist";
 import "../styles/global.css";
 import SiteHeader from "../components/SiteHeader.astro";
-import SoundToggle from "../components/SoundToggle.astro";
+import SoundEffects from "../components/SoundEffects.astro";
 import { profileLinks, site } from "../data/site";
 
 interface Props {
@@ -14,7 +14,14 @@ interface Props {
 }
 
 const { title, description, noindex = false } = Astro.props;
-const pageTitle = title === site.name ? `${site.name} — ${site.role}` : `${title} — ${site.name}`;
+const isHomeTitle = title === site.name;
+
+// The tab just says "Vee" on the home page — a tab is not the place for a job
+// title. Sub-pages stay prefixed so a row of tabs is still tellable apart.
+const pageTitle = isHomeTitle ? site.name : `${title} — ${site.name}`;
+
+// Link previews get the fuller line: "Vee" alone tells a reader nothing.
+const shareTitle = isHomeTitle ? `${site.name} — ${site.role}` : pageTitle;
 const year = new Date().getFullYear();
 ---
 
@@ -27,7 +34,7 @@ const year = new Date().getFullYear();
     {noindex && <meta name="robots" content="noindex, nofollow" />}
     <meta name="theme-color" content="#fcfcfc" />
     <meta property="og:type" content="website" />
-    <meta property="og:title" content={pageTitle} />
+    <meta property="og:title" content={shareTitle} />
     <meta property="og:description" content={description} />
     <meta name="twitter:card" content="summary" />
     <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
@@ -42,10 +49,16 @@ const year = new Date().getFullYear();
     <main id="main">
       <slot />
     </main>
+    <div class="blank-space column">
+      <p class="blank-space__mark">[This Space Intentionally Left Blank]</p>
+      <p class="blank-space__note">
+        The bottom of every page is padded so readers can maintain a consistent eyeline.
+      </p>
+    </div>
     <footer class="site-footer column">
       <div>
         <p class="meta">{site.location} · {year}</p>
-        <p class="lede" style="margin-top: 0.4rem; font-size: 0.92rem;">Say hello — I read everything.</p>
+        <p class="lede footer-hello">Say hello — I read everything.</p>
       </div>
       <div class="site-footer__end">
         <nav class="footer-links" aria-label="Elsewhere">
@@ -60,9 +73,53 @@ const year = new Date().getFullYear();
             {link.href.startsWith("http") && <span class="sr-only"> (opens in a new tab)</span>}
           </a>
         ))}
+        <a
+          id="telegram-dm"
+          href={site.telegram.href}
+          data-sfx="nav"
+          target="_blank"
+          rel="noreferrer"
+        >
+          Telegram<span class="sr-only"> (opens in a new tab)</span>
+        </a>
         </nav>
-        <SoundToggle />
       </div>
     </footer>
+    <SoundEffects />
+
+    <script>
+      /*
+       * Press T anywhere to open a Telegram DM.
+       *
+       * A bare key rather than a chord on purpose: Cmd/Ctrl+T is reserved by
+       * every browser for "new tab" and cannot be intercepted by a page, so a
+       * shortcut built on it would simply never fire.
+       *
+       * It clicks the real anchor in the footer rather than calling
+       * window.open, so the link's target and rel apply and the navigation
+       * counts as the same user gesture that pop-up blockers look for.
+       */
+      document.addEventListener("keydown", (event) => {
+        if (event.key !== "t" && event.key !== "T") return;
+
+        // Leave every modifier combination to the browser, Cmd+T included.
+        if (event.metaKey || event.ctrlKey || event.altKey) return;
+
+        // Typing a T into a field is not a request to leave the page.
+        const el = event.target;
+        if (
+          el instanceof HTMLElement &&
+          (el.isContentEditable || ["INPUT", "TEXTAREA", "SELECT"].includes(el.tagName))
+        ) {
+          return;
+        }
+
+        // A book or photo is open; the key belongs to that, not to the footer.
+        if (document.querySelector("dialog[open]")) return;
+
+        event.preventDefault();
+        document.getElementById("telegram-dm")?.click();
+      });
+    </script>
   </body>
 </html>

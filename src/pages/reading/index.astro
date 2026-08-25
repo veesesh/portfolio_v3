@@ -1,7 +1,9 @@
 ---
 import { getCollection } from "astro:content";
 import BaseLayout from "../../layouts/BaseLayout.astro";
+import PixelHeading from "../../components/PixelHeading.astro";
 import LinkRow from "../../components/LinkRow.astro";
+import Bookshelf from "../../components/Bookshelf.astro";
 
 const shelf = (await getCollection("reading"))
   .filter((item) => item.data.kind === "Book")
@@ -17,23 +19,15 @@ const blogs = (await getCollection("writing")).sort(
   description="Books and blog posts Vee keeps close and keeps pointing people at."
 >
   <header class="page-head column">
-    <h1>Reading</h1>
-    <p>A small archive of books and notes worth keeping close.</p>
+    <PixelHeading title="Reading" section="Reading" />
+    <p>Occasionally I write and mediocrely I read books. Some of these are below:</p>
   </header>
 
   <section class="section column" aria-labelledby="shelf">
     <div class="section-head"><h2 id="shelf">Shelf</h2></div>
+    <p class="shelf-copy">Books currently at my shelf</p>
     {shelf.length ? (
-      <ul class="rows">
-        {shelf.map((item) => (
-          <LinkRow
-            title={item.data.title}
-            aside={item.data.author}
-            note={item.data.note}
-            href={item.data.url}
-          />
-        ))}
-      </ul>
+      <Bookshelf books={shelf} />
     ) : (
       <p class="section-note">This shelf is still being filled.</p>
     )}
@@ -41,7 +35,7 @@ const blogs = (await getCollection("writing")).sort(
 
   <section class="section column" aria-labelledby="blogs">
     <div class="section-head"><h2 id="blogs">Blogs</h2></div>
-    <p class="blogs-copy">A few longer notes from me — a good place to get a feel for how I write.</p>
+    <p class="blogs-copy">A few longer notes from me:</p>
     {blogs.length ? (
       <ul class="rows">
         {blogs.map((post) => (
@@ -59,8 +53,9 @@ const blogs = (await getCollection("writing")).sort(
 </BaseLayout>
 
 <style>
+  .shelf-copy,
   .blogs-copy {
-    max-width: 54ch;
+    max-width: 62ch;
     margin: -0.7rem 0 1.35rem;
     color: var(--muted);
     font-size: 0.92rem;

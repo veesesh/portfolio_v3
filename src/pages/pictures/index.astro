@@ -1,22 +1,89 @@
 ---
 import BaseLayout from "../../layouts/BaseLayout.astro";
+import PixelHeading from "../../components/PixelHeading.astro";
+import PhotoGalaxy from "../../components/PhotoGalaxy.astro";
 import Gallery from "../../components/Gallery.astro";
+import LinkRow from "../../components/LinkRow.astro";
+import SectionHead from "../../components/SectionHead.astro";
 import { photos } from "../../data/site";
+
+// Full sets and cuts that live off-site, so the grid below stays a selection
+// rather than trying to be the whole archive.
+const elsewhere = [
+  {
+    title: "Vibe With Hermes Agent",
+    aside: "Gallery",
+    note: "A meetup and a co-build.",
+    href: "https://www.playbook.com/s/devfolio/vibe-with-hermes-agent",
+  },
+  {
+    title: "HMF",
+    aside: "Gallery",
+    note: "A hardware initiative we tried.",
+    href: "https://www.playbook.com/s/devfolio/WJNkW5QDRKxqppgiAzr4wDBH",
+  },
+  {
+    title: "Push to Prod, Singapore",
+    aside: "Video",
+    note: "A recap cut from the sprint with Genspark and Claude.",
+    href: "https://x.com/vee19twt/status/2082062590512160837",
+  },
+  {
+    title: "HMF",
+    aside: "Video",
+    note: "A short edit I put together before the event.",
+    href: "https://x.com/vee19twt/status/2060312942328086958",
+  },
+];
 ---
 
 <BaseLayout
   title="Pictures"
   description="A visual archive of the builder communities, events, and rooms Vee helped bring together."
 >
-  <header class="page-head column">
-    <h1>Pictures</h1>
-    <p>
-      Community moments rather than a photography portfolio — rooms full of builders, and the
-      people who made them worth showing up for.
+  <PhotoGalaxy photos={photos}>
+    <PixelHeading title="Pictures" section="Pictures" scale={4} />
+    <p class="galaxy-copy">
+      A few frames from the hackathons I&rsquo;ve been lucky to be around.
     </p>
-  </header>
+  </PhotoGalaxy>
 
   <section class="column column--wide" aria-label="Photographs">
     <Gallery photos={photos} />
   </section>
+
+  <section class="section column" aria-labelledby="pictures-elsewhere">
+    <SectionHead id="pictures-elsewhere" label="Through my lens" />
+    <p class="elsewhere-note">
+      Photo sets I&rsquo;ve shot and a few videos I&rsquo;ve cut together.
+    </p>
+    <ul class="rows">
+      {elsewhere.map((item) => (
+        <LinkRow title={item.title} aside={item.aside} note={item.note} href={item.href} />
+      ))}
+    </ul>
+  </section>
 </BaseLayout>
+
+<style>
+  /* The banner heading runs well above page-head size and centres, so its copy
+     is restated here rather than inheriting the left-aligned page-head rules. */
+  /* Tucks under the section heading, the way the notes on /reading do. */
+  .elsewhere-note {
+    max-width: 62ch;
+    margin: -0.7rem 0 1.35rem;
+    color: var(--muted);
+    font-size: 0.92rem;
+    line-height: 1.6;
+    text-wrap: pretty;
+  }
+
+  .galaxy-copy {
+    max-width: 46ch;
+    margin: 1rem auto 0;
+    color: var(--muted);
+    font-size: 0.98rem;
+    line-height: 1.65;
+    text-wrap: pretty;
+  }
+</style>

@@ -1,0 +1,120 @@
+---
+/**
+ * A perspective field of photographs drifting behind a page heading.
+ *
+ * A background for text, not a gallery: the images are decorative, carry no alt
+ * text, and take no pointer events. Whatever is slotted in sits above them.
+ */
+import type { Photo } from "../data/site";
+
+interface Props {
+  photos: readonly Photo[];
+  /** How many of them join the field. More is denser, not bigger. */
+  count?: number;
+}
+
+const { photos, count = 18 } = Astro.props;
+const field = photos.slice(0, count);
+---
+
+<div class="galaxy-band">
+  <div class="galaxy" data-galaxy aria-hidden="true">
+    {field.map((photo) => (
+      <div class="galaxy__item">
+        <img src={photo.src} alt="" width={photo.width} height={photo.height} loading="lazy" decoding="async" />
+        <span class="galaxy__veil"></span>
+      </div>
+    ))}
+  </div>
+
+  <div class="galaxy-head column">
+    <slot />
+  </div>
+</div>
+
+<script>
+  import { ImageGalaxy } from "../scripts/image-galaxy";
+
+  const stage = document.querySelector<HTMLElement>("[data-galaxy]");
+
+  if (stage) {
+    const reduced = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+    const items = Array.from(stage.querySelectorAll<HTMLElement>(".galaxy__item"));
+    const veils = items.map((el) => el.querySelector<HTMLElement>(".galaxy__veil"));
+
+    const galaxy = new ImageGalaxy(stage, items, veils, undefined, { reduced });
+    galaxy.start();
+
+    // The engine exposes addScroll but the reference never called it, so the
+    // field only ever auto-drifted. Feeding it the wheel lets it answer to the
+    // reader as well.
+    window.addEventListener(
+      "wheel",
+      (event) => galaxy.addScroll(event.deltaY * 0.35, Math.sign(event.deltaY)),
+      { passive: true },
+    );
+
+    new IntersectionObserver(([entry]) => {
+      if (entry?.isIntersecting) galaxy.start();
+      else galaxy.stop();
+    }).observe(stage);
+
+    let resizeTimer = 0;
+    window.addEventListener("resize", () => {
+      window.clearTimeout(resizeTimer);
+      resizeTimer = window.setTimeout(() => galaxy.layout(), 150);
+    });
+  }
+</script>
+
+<style>
+  .galaxy-band {
+    position: relative;
+    display: grid;
+    place-items: center;
+    min-height: min(72vh, 36rem);
+    margin-bottom: clamp(1.5rem, 4vw, 2.75rem);
+    overflow: hidden;
+  }
+
+  /* The z offsets in the engine mean nothing without this. */
+  .galaxy {
+    position: absolute;
+    inset: 0;
+    z-index: 0;
+    perspective: 900px;
+    transform-style: preserve-3d;
+    pointer-events: none;
+  }
+
+  .galaxy__item {
+    position: absolute;
+    width: clamp(4.5rem, 9vw, 8rem);
+    will-change: transform;
+  }
+
+  .galaxy__item img {
+    display: block;
+    width: 100%;
+    height: auto;
+    border-radius: 6px;
+  }
+
+  /* Depth read as haze: the further back, the more page colour sits in front.
+     A veil in the page's own colour rather than lowered opacity, so an image
+     never shows whatever is behind the band through itself. */
+  .galaxy__veil {
+    position: absolute;
+    inset: 0;
+    border-radius: 6px;
+    background: var(--page);
+  }
+
+  /* The 3D transforms give each image its own stacking context, so without an
+     explicit order the ones at positive z paint over the words. */
+  .galaxy-head {
+    position: relative;
+    z-index: 1;
+    text-align: center;
+  }
+</style>

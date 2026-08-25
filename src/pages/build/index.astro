@@ -1,79 +1,7 @@
 ---
-import { getCollection, render } from "astro:content";
 import BaseLayout from "../../layouts/BaseLayout.astro";
-import ProjectRow from "../../components/ProjectRow.astro";
-
-const entries = await getCollection("projects");
-const projects = await Promise.all(
-  entries.map(async (entry) => ({
-    entry,
-    Content: entry.body?.trim() ? (await render(entry)).Content : undefined,
-  })),
-);
-
-const bands = [
-  {
-    id: "at-devfolio",
-    label: "At Devfolio",
-    categories: [
-      {
-        id: "hackathons",
-        label: "Hackathons",
-        category: "hackathon" as const,
-      },
-      {
-        id: "programs",
-        label: "Programs",
-        category: "program" as const,
-      },
-      {
-        id: "community",
-        label: "Community",
-        category: "community" as const,
-      },
-      {
-        id: "systems",
-        label: "Systems",
-        category: "system" as const,
-      },
-    ],
-  },
-  {
-    id: "side-projects",
-    label: "Outside work",
-    categories: [
-      {
-        id: "projects",
-        label: "Projects",
-        category: "personal" as const,
-      },
-    ],
-  },
-];
-
-type Category = "hackathon" | "program" | "community" | "system" | "personal";
-
-const inCategory = (category: Category) =>
-  projects
-    .filter((item) => item.entry.data.category === category)
-    .sort((a, b) => a.entry.data.order - b.entry.data.order);
-
-/**
- * Splits a category into its named clusters (the three Anthropic hackathons)
- * followed by everything ungrouped, preserving order within each run.
- */
-const clustered = (category: Category) => {
-  const items = inCategory(category);
-  const seen: string[] = [];
-  for (const item of items) {
-    const g = item.entry.data.group;
-    if (g && !seen.includes(g)) seen.push(g);
-  }
-  return [
-    ...seen.map((label) => ({ label, items: items.filter((i) => i.entry.data.group === label) })),
-    { label: undefined, items: items.filter((i) => !i.entry.data.group) },
-  ].filter((run) => run.items.length > 0);
-};
+import PixelHeading from "../../components/PixelHeading.astro";
+import { Content } from "../../notes/build.md";
 ---
 
 <BaseLayout
@@ -81,80 +9,15 @@ const clustered = (category: Category) => {
   description="Builder initiatives, internal systems, and side projects Vee has helped bring to life."
 >
   <header class="page-head column">
-    <h1>Build</h1>
-    <p>Things I build at work and otherwise.</p>
+    <PixelHeading title="Build" section="Build" />
   </header>
 
-  {bands.map((band) => (
-    <section class="band column" aria-labelledby={band.id} id={band.id}>
-      <h2 class="band__label" id={band.id}>{band.label}</h2>
-
-      {band.categories.map((category) => (
-        <div class="build-group" id={category.id}>
-          <h3 class="build-group__label">{category.label}</h3>
-
-          {clustered(category.category).map((run) => (
-            <>
-              {run.label && <p class="build-cluster">{run.label}</p>}
-              <ul class="rows">
-                {run.items.map((item) => (
-                  <ProjectRow
-                    entry={item.entry}
-                    Content={item.Content}
-                    expanded={false}
-                  />
-                ))}
-              </ul>
-            </>
-          ))}
-        </div>
-      ))}
-    </section>
-  ))}
-
+  {/*
+    The note supplies every heading below the h1, so nothing here restates it.
+    `.note` is a global class rather than a scoped one: this markup is rendered
+    from markdown at runtime and never passes through Astro's scoping.
+  */}
+  <div class="section column note">
+    <Content />
+  </div>
 </BaseLayout>
-
-<style>
-  /* "At Devfolio" and "Side projects" — the two halves of the work. */
-  .band + .band {
-    margin-top: clamp(3rem, 7vw, 4.5rem);
-  }
-
-  .band__label {
-    margin: 0;
-    padding-top: clamp(2.5rem, 6vw, 3.5rem);
-    border-top: 1px solid var(--rule-strong);
-    font-family: var(--display);
-    font-size: clamp(1.5rem, 3.4vw, 1.9rem);
-    font-weight: 600;
-    letter-spacing: -0.03em;
-    line-height: 1.1;
-  }
-
-  .build-group {
-    padding-top: clamp(1.7rem, 3.8vw, 2.25rem);
-  }
-
-  .build-group__label {
-    margin: 0 0 0.5rem;
-    color: var(--ink);
-    font-family: var(--display);
-    font-size: clamp(1.1rem, 2.4vw, 1.3rem);
-    font-weight: 600;
-    letter-spacing: -0.025em;
-  }
-
-  /* A named cluster inside a group, e.g. the three Anthropic hackathons. */
-  .build-cluster {
-    margin: 1.5rem 0 0.35rem;
-    color: var(--faint);
-    font-family: var(--mono);
-    font-size: 0.68rem;
-    letter-spacing: 0.12em;
-    text-transform: uppercase;
-  }
-
-  .build-cluster:first-of-type {
-    margin-top: 0;
-  }
-</style>

@@ -5,8 +5,12 @@ import Portrait from "../components/Portrait.astro";
 import NameReveal from "../components/NameReveal.astro";
 import SectionHead from "../components/SectionHead.astro";
 import LinkRow from "../components/LinkRow.astro";
+import Bookshelf from "../components/Bookshelf.astro";
 import RainbowToggle from "../components/RainbowToggle.astro";
-import { about, aboutPlain, photos, profileLinks, site, spotify } from "../data/site";
+import LinkPreview from "../components/LinkPreview.astro";
+import { about, aboutPlain, profileLinks, site, stripPhotos } from "../data/site";
+import { existsSync } from "node:fs";
+import { join } from "node:path";
 import { period } from "../lib/format";
 
 const rolesById = new Map((await getCollection("roles")).map((role) => [role.id, role]));
@@ -14,11 +18,25 @@ const roles = ["devfolio", "codeday-hyderabad", "hackerabad", "kalakumbh"].flatM
   (id) => rolesById.get(id) ?? [],
 );
 
-const reading = (await getCollection("reading"))
-  .sort((a, b) => a.data.order - b.data.order)
-  .slice(0, 4);
+/** The whole shelf, left to right, exactly as it stands on the reading page. */
+const shelf = (await getCollection("reading"))
+  .filter((item) => item.data.kind === "Book")
+  .sort((a, b) => a.data.order - b.data.order);
 
-const strip = photos.slice(0, 4);
+const strip = stripPhotos;
+
+/**
+ * A preview is only offered when its screenshot is actually on disk. Trusting
+ * the data alone would hand a visitor an empty browser frame for any link whose
+ * image had not been added yet, which looks broken rather than unfinished.
+ */
+const links = profileLinks.map((link) => ({
+  ...link,
+  preview:
+    link.preview && existsSync(join(process.cwd(), "public", link.preview))
+      ? link.preview
+      : undefined,
+}));
 ---
 
 <BaseLayout title={site.name} description={aboutPlain}>
@@ -26,17 +44,21 @@ const strip = photos.slice(0, 4);
     <div class="hero__text">
       <h1 class="hero__name"><NameReveal variant="hero" /></h1>
 
+      <p class="lede hero__intro">{about.greeting}</p>
+
       <p class="lede hero__intro">
-        {about.before}<a href={about.link.href} data-sfx="nav" target="_blank" rel="noreferrer"
-          >{about.link.label}<span class="sr-only"> (opens in a new tab)</span></a
-        >{about.after}
+        {about.lead}{" "}
+        {about.now.before}<a href={about.now.link.href} data-sfx="nav" target="_blank" rel="noreferrer"
+          >{about.now.link.label}<span class="sr-only"> (opens in a new tab)</span></a
+        >{about.now.after}
       </p>
 
       <nav class="hero__links" aria-label="Elsewhere">
-        {profileLinks.map((link) => (
+        {links.map((link) => (
           <a
             href={link.href}
             data-sfx="nav"
+            data-preview={link.preview}
             target={link.href.startsWith("http") ? "_blank" : undefined}
             rel={link.href.startsWith("http") ? "noreferrer" : undefined}
           >
@@ -45,6 +67,17 @@ const strip = photos.slice(0, 4);
           </a>
         ))}
       </nav>
+
+      {/*
+        A step quieter than the row above it, and only the destination is a
+        link — so it reads as an aside rather than a sixth social account.
+      */}
+      <p class="hero__hint">
+        press <kbd>T</kbd> to say hi on{" "}
+        <a href={site.telegram.href} data-sfx="nav" target="_blank" rel="noreferrer"
+          >Telegram<span class="sr-only"> (opens in a new tab)</span></a
+        >
+      </p>
     </div>
 
     <div class="hero__figure">
@@ -71,26 +104,27 @@ const strip = photos.slice(0, 4);
   </section>
 
   <section class="section column" aria-labelledby="home-building">
-    <SectionHead id="home-building" label="Build" href="/build" seeAll="see all" />
+    <SectionHead id="home-building" label="Build" href="/build" seeAll="see everything" />
+    <p class="build-note">Things I&rsquo;ve worked on.</p>
     <ul class="rows">
       {[
         {
-          title: "Initiatives",
+          title: "Hackathons & Initiatives",
           aside: "Devfolio",
-          note: "Builder programs and hackathon experiences I help take from an idea to a room full of people.",
-          href: "/build#initiatives",
+          note: "I've helped run builder initiatives across India and beyond, including programs with Anthropic and AWS.",
+          href: "/build#initiatives-and-hackathons",
         },
         {
-          title: "Systems",
+          title: "Agentic Systems",
           aside: "Devfolio",
-          note: "Internal tools and agents that make the recurring parts of the work lighter.",
-          href: "/build#systems",
+          note: "I get bored of doing the same thing twice, so I build agents and tools around it.",
+          href: "/build#agentic-systems",
         },
         {
-          title: "Own projects",
+          title: "Personal Projects",
           aside: "Side quests",
-          note: "Things I make outside work, usually with friends, curiosity, and a short deadline.",
-          href: "/build#own-projects",
+          note: "Things I build outside work, usually out of curiosity, with friends, or just because I wanted to see if I could.",
+          href: "/build#side-projects",
         },
       ].map((project) => (
         <LinkRow
@@ -103,39 +137,24 @@ const strip = photos.slice(0, 4);
     </ul>
   </section>
 
-  <section class:list={["section", "column", { "section--bare": reading.length === 0 }]} aria-labelledby="home-reading">
-    <SectionHead id="home-reading" label="Reading" />
-    {reading.length ? (
-      <ul class="rows">
-        {reading.map((item) => (
-          <LinkRow
-            title={item.data.title}
-            aside={item.data.kind}
-            note={`${item.data.author} — ${item.data.note}`}
-            href={item.data.url}
-          />
-        ))}
-      </ul>
+  <section class:list={["section", "column", { "section--bare": shelf.length === 0 }]} aria-labelledby="home-reading">
+    <SectionHead id="home-reading" label="Reading" href="/reading" seeAll="see the whole shelf" />
+    {shelf.length ? (
+      <>
+        <p class="reading-note">These are the books currently sitting on my shelf at home. Poke around and pick one.</p>
+        <Bookshelf books={shelf} eager={false} />
+      </>
     ) : (
       <p class="section-note">Shelf still being filled.</p>
     )}
   </section>
 
-  <section class="section column" aria-labelledby="home-listening">
-    <SectionHead id="home-listening" label="Listening" />
-    <ul class="rows">
-      <LinkRow
-        title={spotify.title}
-        aside="Spotify"
-        note="A small, current corner of the internet for what has been in rotation lately."
-        href="/listening"
-      />
-    </ul>
-  </section>
-
   <section class="section column" aria-labelledby="home-pictures">
-    <SectionHead id="home-pictures" label="Pictures" />
-    <p class="pictures-note">I also photograph and make little videos here and there. I’ll share a few of them soon.</p>
+    <SectionHead id="home-pictures" label="Pictures" href="/pictures" seeAll="through my lens" />
+    <p class="pictures-note">A few frames from the hackathons I&rsquo;ve been lucky to be around.</p>
+    <p class="pictures-note pictures-note--second">
+      Photo sets I&rsquo;ve shot and a few videos I&rsquo;ve cut together.
+    </p>
     <a class="strip" href="/pictures" data-sfx="row" aria-label="Open the pictures page">
       {strip.map((photo, index) => (
         <img
@@ -154,7 +173,9 @@ const strip = photos.slice(0, 4);
     <a class="life-link" href="/life" data-sfx="row">Other parts of my life <span aria-hidden="true">→</span></a>
   </section>
 
+  <LinkPreview />
 </BaseLayout>
+
 
 <style>
   /* Layout B: text on the spine of the page, portrait to the right. Shares the
@@ -180,7 +201,13 @@ const strip = photos.slice(0, 4);
   .hero__intro {
     max-width: 40ch;
     margin: 1.3rem 0 0;
+    text-align: justify;
+    /* Justifying a 40ch measure without hyphenation opens rivers of white space
+       between words. Auto-hyphenation lets the browser break long words instead
+       of stretching the spaces around them. */
+    hyphens: auto;
   }
+
 
   .hero__intro a {
     color: var(--accent);
@@ -217,6 +244,37 @@ const strip = photos.slice(0, 4);
     border-bottom-color: var(--accent);
   }
 
+  .hero__hint {
+    margin: 0.55rem 0 0;
+    color: var(--faint);
+    font-family: var(--mono);
+    font-size: 0.72rem;
+  }
+
+  .hero__hint a {
+    color: var(--muted);
+    text-underline-offset: 0.2em;
+  }
+
+  .hero__hint a:hover {
+    color: var(--accent);
+  }
+
+  .hero__hint kbd {
+    display: inline-block;
+    min-width: 1.4em;
+    border: 1px solid var(--rule-strong);
+    border-bottom-width: 2px;
+    border-radius: 4px;
+    padding: 0.02em 0.3em;
+    background: var(--page);
+    color: var(--ink);
+    font-family: var(--mono);
+    font-size: 0.95em;
+    line-height: 1.35;
+    text-align: center;
+  }
+
   .strip {
     display: grid;
     grid-template-columns: repeat(4, minmax(0, 1fr));
@@ -230,6 +288,12 @@ const strip = photos.slice(0, 4);
     padding-block: 0.5rem;
   }
 
+  .pictures-note--second {
+    margin-top: -1rem !important;
+  }
+
+  .build-note,
+  .reading-note,
   .pictures-note {
     max-width: 54ch;
     margin: -0.7rem 0 1.35rem;

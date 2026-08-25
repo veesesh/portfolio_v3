@@ -1,0 +1,43 @@
+---
+/**
+ * The bench that chose the treatment now live on /pictures. Kept so the field
+ * can be judged against a different photo count without touching the real page.
+ *
+ * It renders the same component the real page does — the effect must not exist
+ * twice, or a fix made here would quietly not apply there.
+ */
+import BaseLayout from "../layouts/BaseLayout.astro";
+import PhotoGalaxy from "../components/PhotoGalaxy.astro";
+import PixelHeading from "../components/PixelHeading.astro";
+import Gallery from "../components/Gallery.astro";
+import { photos } from "../data/site";
+---
+
+<BaseLayout title="Galaxy lab" description="A drifting perspective field of photographs behind the Pictures heading.">
+  <PhotoGalaxy photos={photos} count={24}>
+    <PixelHeading title="Pictures" section="Pictures" scale={4} />
+    <p class="galaxy-copy">
+      Twenty-four in the field rather than eighteen — everything else matches <a href="/pictures">/pictures</a>.
+    </p>
+  </PhotoGalaxy>
+
+  <section class="column column--wide" aria-label="Photographs">
+    <Gallery photos={photos} />
+  </section>
+</BaseLayout>
+
+<style>
+  .galaxy-copy {
+    max-width: 46ch;
+    margin: 1rem auto 0;
+    color: var(--muted);
+    font-size: 0.98rem;
+    line-height: 1.65;
+    text-wrap: pretty;
+  }
+
+  .galaxy-copy a {
+    color: var(--accent);
+    text-underline-offset: 0.2em;
+  }
+</style>

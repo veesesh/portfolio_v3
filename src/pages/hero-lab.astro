@@ -1,0 +1,181 @@
+---
+/**
+ * Two placements for the Telegram shortcut hint in the hero, so they can be
+ * compared before either goes on the home page.
+ *
+ * A — its own line under the social links.
+ * B — inline, at the end of the same line.
+ *
+ * The links, the portrait and the copy are the real ones, so the only thing
+ * changing between the two is where the hint sits.
+ */
+import BaseLayout from "../layouts/BaseLayout.astro";
+import Portrait from "../components/Portrait.astro";
+import NameReveal from "../components/NameReveal.astro";
+import { about, profileLinks, site } from "../data/site";
+
+const variants = [
+  { id: "a", label: "A — on its own line, under the links" },
+  { id: "b", label: "B — inline, on the same line (needs shorter copy to fit)" },
+];
+---
+
+<BaseLayout title="Hero lab" description="Two placements for the Telegram shortcut hint.">
+  <header class="page-head column">
+    <h1>Hero lab</h1>
+    <p>The same hero twice. The only difference is where “press T to say hi on Telegram” sits.</p>
+  </header>
+
+  {variants.map((variant) => (
+    <section class="section column" aria-labelledby={`hero-${variant.id}`}>
+      <div class="section-head"><h2 id={`hero-${variant.id}`}>{variant.label}</h2></div>
+
+      <div class:list={["hero", "hero-demo", `hero-demo--${variant.id}`]}>
+        <div class="hero__text">
+          <h3 class="hero__name"><NameReveal variant="hero" /></h3>
+          <p class="lede hero__intro">{about.greeting}</p>
+          <p class="lede hero__intro">{about.lead}</p>
+
+          <nav class="hero__links" aria-label="Elsewhere">
+            {profileLinks.map((link) => (
+              <a
+                href={link.href}
+                data-sfx="nav"
+                target={link.href.startsWith("http") ? "_blank" : undefined}
+                rel={link.href.startsWith("http") ? "noreferrer" : undefined}
+              >
+                {link.label}
+                {link.href.startsWith("http") && <span class="sr-only"> (opens in a new tab)</span>}
+              </a>
+            ))}
+
+            {/* B keeps the hint inside the nav so it flows with the links. */}
+            {variant.id === "b" && (
+              <span class="hero__hint hero__hint--inline">
+                <kbd>T</kbd>{" "}
+                <a href={site.telegram.href} data-sfx="nav" target="_blank" rel="noreferrer"
+                  >Telegram<span class="sr-only"> (opens in a new tab)</span></a
+                >
+              </span>
+            )}
+          </nav>
+
+          {variant.id === "a" && (
+            <p class="hero__hint hero__hint--own">
+              press <kbd>T</kbd> to say hi on{" "}
+              <a href={site.telegram.href} data-sfx="nav" target="_blank" rel="noreferrer"
+                >Telegram<span class="sr-only"> (opens in a new tab)</span></a
+              >
+            </p>
+          )}
+        </div>
+
+        <div class="hero__figure">
+          <Portrait alt={`${site.name}, drawn in coloured pencil`} />
+        </div>
+      </div>
+    </section>
+  ))}
+</BaseLayout>
+
+<style>
+  .hero-demo {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) auto;
+    align-items: center;
+    gap: clamp(1.75rem, 4vw, 3rem);
+    padding-block: 0;
+  }
+
+  .hero__figure {
+    width: 12.5rem;
+  }
+
+  .hero__name {
+    margin: 0;
+    line-height: 1;
+  }
+
+  .hero__intro {
+    max-width: 40ch;
+    margin: 1.3rem 0 0;
+  }
+
+  .hero__links {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: baseline;
+    gap: 0.4rem 1.2rem;
+    margin-top: 1.6rem;
+  }
+
+  .hero__links a {
+    font-family: var(--mono);
+    font-size: 0.78rem;
+    color: var(--muted);
+    text-decoration: none;
+    padding-block: 0.3rem;
+    border-bottom: 1px solid transparent;
+    transition: color 130ms ease, border-color 130ms ease;
+  }
+
+  .hero__links a:hover {
+    color: var(--accent);
+    border-bottom-color: var(--accent);
+  }
+
+  /* The hint is furniture, not a sixth link, so it sits a step quieter than the
+     row it belongs to. Only the word Telegram is clickable. */
+  .hero__hint {
+    color: var(--faint);
+    font-family: var(--mono);
+    font-size: 0.72rem;
+  }
+
+  .hero__hint a {
+    color: var(--muted);
+    text-underline-offset: 0.2em;
+  }
+
+  .hero__hint a:hover {
+    color: var(--accent);
+  }
+
+  .hero__hint--own {
+    margin: 0.55rem 0 0;
+  }
+
+  /* Nudged off the last link so it reads as an aside rather than another item
+     in the list. */
+  .hero__hint--inline {
+    margin-left: 0.2rem;
+    white-space: nowrap;
+  }
+
+  .hero__hint kbd {
+    display: inline-block;
+    min-width: 1.4em;
+    border: 1px solid var(--rule-strong);
+    border-bottom-width: 2px;
+    border-radius: 4px;
+    padding: 0.02em 0.3em;
+    background: var(--page);
+    color: var(--ink);
+    font-family: var(--mono);
+    font-size: 0.95em;
+    line-height: 1.35;
+    text-align: center;
+  }
+
+  @media (max-width: 720px) {
+    .hero-demo {
+      grid-template-columns: 1fr;
+      gap: 1.75rem;
+    }
+
+    .hero__figure {
+      order: -1;
+      width: 11rem;
+    }
+  }
+</style>

@@ -4,8 +4,8 @@ org: "devfolio"
 descriptor: "Community and program operations"
 summary: "Turning a program idea into an experience builders can understand, enter, and remember — online, on campus, and in rooms around the world."
 year: "2022 — now"
-order: 3
-category: "initiative"
+order: 1
+category: "program"
 featured: true
 links:
   - label: "Build India 2026"

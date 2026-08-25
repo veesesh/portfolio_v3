@@ -1,0 +1,85 @@
+---
+/**
+ * The bench that chose the treatment now live on /life. Kept so the two can
+ * still be compared, and so the joint value can be re-judged against the
+ * bordered version rather than from memory.
+ */
+import BaseLayout from "../layouts/BaseLayout.astro";
+import LiquidCards from "../components/LiquidCards.astro";
+import { lifeSections } from "../data/site";
+
+const idFor = (title: string) => title.toLowerCase().replaceAll(" ", "-");
+---
+
+<BaseLayout title="Liquid lab" description="Comparing the old life cards against the liquid treatment now live.">
+  <header class="page-head column">
+    <h1>Liquid lab</h1>
+    <p>
+      The same four cards, twice. A is the bordered version <a href="/life">/life</a> used to have.
+      B is what it uses now — drag a card, or pull the slider from crisp to gooey.
+    </p>
+  </header>
+
+  <section class="section column" aria-labelledby="lab-a">
+    <div class="section-head"><h2 id="lab-a">A — the old bordered cards</h2></div>
+    <div class="life-grid">
+      {lifeSections.map((section) => (
+        <article class="life-card" id={`old-${idFor(section.title)}`}>
+          <p class="meta">{section.eyebrow}</p>
+          <h3>{section.title}</h3>
+          <p>{section.note}</p>
+        </article>
+      ))}
+    </div>
+  </section>
+
+  <section class="section column" aria-labelledby="lab-b">
+    <div class="section-head"><h2 id="lab-b">B — poured together (live)</h2></div>
+    <LiquidCards sections={lifeSections} controls />
+  </section>
+</BaseLayout>
+
+<style>
+  .page-head a {
+    color: var(--accent);
+    text-underline-offset: 0.2em;
+  }
+
+  .life-grid {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 0.7rem;
+  }
+
+  .life-card {
+    min-height: 13rem;
+    border: 1px solid var(--rule);
+    border-radius: 9px;
+    padding: clamp(1.2rem, 3vw, 1.8rem);
+  }
+
+  .life-card .meta,
+  .life-card p {
+    margin: 0;
+  }
+
+  .life-card h3 {
+    margin: 0.45rem 0 0.75rem;
+    color: var(--ink);
+    font-family: var(--display);
+    font-size: 1.45rem;
+    font-weight: 600;
+    letter-spacing: -0.025em;
+  }
+
+  .life-card > p:not(.meta) {
+    color: var(--muted);
+    line-height: 1.6;
+  }
+
+  @media (max-width: 560px) {
+    .life-grid {
+      grid-template-columns: 1fr;
+    }
+  }
+</style>

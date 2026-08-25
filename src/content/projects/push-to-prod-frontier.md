@@ -6,7 +6,7 @@ summary: "Led the builder experience and operating work behind a one-day frontie
 year: "2026"
 order: 1
 category: "hackathon"
-group: "Three Anthropic hackathons"
+group: "3 with Anthropic"
 featured: true
 href: "https://pushtoprod-india.devfolio.co/overview"
 links:

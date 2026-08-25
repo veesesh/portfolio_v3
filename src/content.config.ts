@@ -36,7 +36,9 @@ const projects = defineCollection({
     /** Sorts newest first within an org. */
     order: z.number(),
     /** The way a build appears on the public Build page. */
-    category: z.enum(["initiative", "system", "personal"]),
+    category: z.enum(["hackathon", "program", "community", "system", "personal"]),
+    /** Optional cluster inside a category, e.g. the three Anthropic hackathons. */
+    group: z.string().optional(),
     featured: z.boolean().default(false),
     href: z.url().optional(),
     links: z.array(linkSchema).default([]),
@@ -65,6 +67,10 @@ const reading = defineCollection({
     note: z.string(),
     order: z.number(),
     url: z.url().optional(),
+    /** Spine colour on the shelf. Falls back to a rotating set when absent. */
+    color: z.string().optional(),
+    /** Roughly how thick the book is, 1–5. Only affects the spine's width. */
+    thickness: z.number().min(1).max(5).optional(),
   }),
 });
 
