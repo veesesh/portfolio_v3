@@ -39,6 +39,7 @@ const externalLinks = {
 };
 
 export default defineConfig({
+  site: "https://veesesh.tech",
   prefetch: true,
   markdown: {
     processor: satteri({ hastPlugins: [externalLinks] }),
