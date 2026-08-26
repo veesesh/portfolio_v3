@@ -25,6 +25,11 @@ const shelf = (await getCollection("reading"))
 
 const strip = stripPhotos;
 
+/** Newest first, same order the blogs run in on /reading. */
+const posts = (await getCollection("writing")).sort(
+  (a, b) => b.data.date.valueOf() - a.data.date.valueOf(),
+);
+
 /**
  * A preview is only offered when its screenshot is actually on disk. Trusting
  * the data alone would hand a visitor an empty browser frame for any link whose
@@ -117,7 +122,7 @@ const links = profileLinks.map((link) => ({
         {
           title: "Agentic Systems",
           aside: "Devfolio",
-          note: "I get bored of doing the same thing twice, so I build agents and tools around it.",
+          note: "I get bored with doing the same thing twice, so I built agents and tools around it.",
           href: "/build#agentic-systems",
         },
         {
@@ -149,12 +154,24 @@ const links = profileLinks.map((link) => ({
     )}
   </section>
 
+  <section class="section column" aria-labelledby="home-writing">
+    <SectionHead id="home-writing" label="Writing" href="/reading#blogs" seeAll="read the rest" />
+    <p class="writing-note">Longer notes I&rsquo;ve written, mostly about the rooms I help put together.</p>
+    <ul class="rows">
+      {posts.map((post) => (
+        <LinkRow
+          title={post.data.title}
+          aside={post.data.outlet}
+          note={post.data.summary}
+          href={post.data.url}
+        />
+      ))}
+    </ul>
+  </section>
+
   <section class="section column" aria-labelledby="home-pictures">
     <SectionHead id="home-pictures" label="Pictures" href="/pictures" seeAll="through my lens" />
     <p class="pictures-note">A few frames from the hackathons I&rsquo;ve been lucky to be around.</p>
-    <p class="pictures-note pictures-note--second">
-      Photo sets I&rsquo;ve shot and a few videos I&rsquo;ve cut together.
-    </p>
     <a class="strip" href="/pictures" data-sfx="row" aria-label="Open the pictures page">
       {strip.map((photo, index) => (
         <img
@@ -167,6 +184,7 @@ const links = profileLinks.map((link) => ({
         />
       ))}
     </a>
+    <p class="strip-caption">Photo sets I&rsquo;ve shot and a few videos I&rsquo;ve cut together.</p>
   </section>
 
   <section class="section column" aria-label="Other parts of my life">
@@ -288,12 +306,18 @@ const links = profileLinks.map((link) => ({
     padding-block: 0.5rem;
   }
 
-  .pictures-note--second {
-    margin-top: -1rem !important;
+  /* Sits under the frames it describes, so it reads as their caption. */
+  .strip-caption {
+    max-width: 54ch;
+    margin: 0.75rem 0 0;
+    color: var(--muted);
+    font-size: 0.92rem;
+    line-height: 1.6;
   }
 
   .build-note,
   .reading-note,
+  .writing-note,
   .pictures-note {
     max-width: 54ch;
     margin: -0.7rem 0 1.35rem;

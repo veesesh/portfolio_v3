@@ -18,7 +18,9 @@ I've been around hackathons since 2020. They got me my first job.
 
 At Devfolio, I manage bits of almost everything: community, ops, support, initiatives & student programs, video editing, photography and everything else in between.
 
-I have a hard time staying in one lane, but one thing is common: **making the builder experience a little better.**
+I have a hard time staying in one lane, but one thing is common:
+
+**making the builder experience a little better.**
 
 ### Initiatives and Hackathons:
 
@@ -29,15 +31,17 @@ I have contributed to builder initiatives across formats, geographies and occasi
     - [Push to Prod](https://push-to-prod.devfolio.co/) Hackathon with Genspark & Claude (Singapore)
         - My first try at editing a recap video [Video Recap](https://x.com/vee19twt/status/2082062590512160837)
     - [Push to Prod](https://pushtoprod-india.devfolio.co/overview) Hackathon: Building at the Frontier
-- BlockTrain: 36-hour hackathon on train (so cool of us, right?)
-- **ETHIndiaVilla** (yes, a hackathon in a villa): a smaller and more intentional builder format
-- Online support for **ETHDenver 2026** and **The Synthesis** (one of the agentic hackathons)
+- [BlockTrain](https://blocktrain.devfolio.co/overview): 36-hour hackathon on train (so cool of us, right?)
+- [**ETHIndiaVilla**](https://ethindia-villa.devfolio.co/overview) (yes, a hackathon in a villa): a smaller and more intentional builder format
+- Online support for [**ETHDenver 2026**](https://ethdenver2026.devfolio.co/overview) and [**The Synthesis**](https://devfolio.co/blog/synthesis/) (one of the agentic hackathons)
 
 ### Programs:
 
 I also ran the university program for [**Devfolio Student Hackathon Grants with AWS**](https://devfolio-student-hackathon-grants.devfolio.co/overview), helping student organisers access grants, resources, operational support, and the Devfolio platform.
 
-I also handle a chunk of **University Relations** at Devfolio (so when you see a [hackathon](https://devfolio.co/hackathons) appear on Devfolio, there's a decent chance I've looked at it, spoken to the organizers, or clicked the button that lets it through)
+I also handle a chunk of **University Relations** at Devfolio.
+
+(so when you see a [hackathon](https://devfolio.co/hackathons) appear on Devfolio, there's a decent chance I've looked at it, spoken to the organizers, or clicked the button that lets it through)
 
 ### Agentic Systems:
 
@@ -57,25 +61,45 @@ I began treating those repetitions as systems-design opportunities, and here's w
         - Basically: **if I have to make the same decision enough times, I eventually try to make the computer remember it.**
 - Support Bot:
     - Takes all the context from the Devfolio Guide
-    - RAG-based support bot for anything related to the platform
     - I built a multi-channel RAG assistant around Devfolio's guide and blog. It combines semantic and full-text retrieval, expands neighbouring context, returns source links, keeps conversation context, and escalates when the evidence is not strong enough.
 
 ### Community Experiments:
 
 - Vibe with Hermes:
     - Using Hermes internally eventually evolved into Vibe With Hermes Agent, a small, hands-on meetup focused on building agents with your own context.
-    - This was probably the first event where I genuinely felt like I was doing everything: planning, organising, comms, programming, running the workshop, helping builders, and photographing the thing when I had a free hand (felt like a single-man army)
+    - This was probably the first event where I genuinely felt like I was doing everything: planning, organising, comms, programming, running the workshop, helping builders, and photographing the thing when I had a free hand *(felt like a single-man army)*
         - blog [here](https://devfolio.co/blog/vibe-with-hermes-agent/)
         - captured the event ([here](https://www.playbook.com/s/devfolio/vibe-with-hermes-agent))
-- HMF
-    - A small hardware-focused experiment.
-    - I helped organise it
+- [HMF, Hack Make Fix](https://devfolio.co/blog/the-first-edition-of-our-hardware/)
+    - A small hardware-focused experiment I helped organise.
     - Captured the event ([photo gallery](https://www.playbook.com/s/devfolio/WJNkW5QDRKxqppgiAzr4wDBH))
 
 ## Side Projects
 
 Things I make outside work, usually with friends, out of curiosity, and under a short deadline.
 
-- [NAASH — Not Another AI Shell](https://github.com/Sushants-Git/team-gap): a natural-language terminal shell with clipboard and error-log history. Built with a team, and it won HackThisFall.
-- [Scratch Blogs](https://github.com/veesesh/backend_scratchblogs): a multimodal writing environment for Markdown, diagrams and images. I worked on the backend.
-- [Snippet Safe](https://github.com/Sushants-Git/SnippetsSafe): a bookmarking tool for storing and organising code snippets, built with a team. Won Frost Hacks.
+### Scratch Blogs
+
+*December 2024*
+
+- A web-based tool for writing and formatting with Markdown, drawing diagrams in Excalidraw, and generating content from those drawings.
+- Real-time diagram creation, seamless image uploads, and structured content built from the drawings themselves.
+- Stack: React, TypeScript and Express, deployed on an Azure VM.
+- [Backend on GitHub](https://github.com/veesesh/backend_scratchblogs)
+
+### NAASH, Not Another AI Shell
+
+*November 2024*
+
+- An AI-powered terminal shell built for speed: natural-language interaction, clipboard management and error-log history.
+- Won 1st prize at Hack This Fall Virtual, 1,000 USD.
+- Stack: Node.js, CLI and AI.
+- [On GitHub](https://github.com/Sushants-Git/team-gap)
+
+### Snippet Safe
+
+*January 2024*
+
+- A bookmarking tool for storing and organising code snippets, using Hugging Face sentence-similarity models to compare text embeddings.
+- Won 1st prize at FrostHacks, an in-person hackathon sponsored by MLH, 12,000 INR.
+- [On GitHub](https://github.com/Sushants-Git/SnippetsSafe)
