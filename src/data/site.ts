@@ -154,7 +154,7 @@ export const lifeSections: readonly LifeSection[] = [
 export const photos: readonly Photo[] = [
   {
     src: "/images/ethindia-organizers.jpg",
-    alt: "The ETHIndia organizing team crowded in front of the main screen, badges on, at the end of the hackathon",
+    alt: "The ETHIndia organising team crowded in front of the main screen, badges on, at the end of the hackathon",
     width: 1800,
     height: 1200,
   },
@@ -196,7 +196,7 @@ export const photos: readonly Photo[] = [
   },
   {
     src: "/images/train-to-the-event.jpg",
-    alt: "A train compartment full of organizers on the way to an event, banners strung above the berth",
+    alt: "A train compartment full of organisers on the way to an event, banners strung above the berth",
     width: 1800,
     height: 1350,
   },
@@ -220,19 +220,19 @@ export const photos: readonly Photo[] = [
   },
   {
     src: "/images/vee-presenting.jpg",
-    alt: "Vee presenting at Vibe with Hermes at the Devfolio office, the run of show on screen",
+    alt: "Vee presenting at Vibe With Hermes Agent at the Devfolio office, the run of show on screen",
     width: 1280,
     height: 960,
   },
   {
     src: "/images/vibe-with-hermes.jpg",
-    alt: "The room set up for Vibe with Hermes at the Devfolio office, under the never-stop-building wall art",
+    alt: "The room set up for Vibe With Hermes Agent at the Devfolio office, under the never-stop-building wall art",
     width: 1800,
     height: 1202,
   },
   {
     src: "/images/push-to-prod-frame.jpg",
-    alt: "Posing inside the oversized Push to Prod photo frame, the hackathon run with Claude, Elevation Capital and Mesa School",
+    alt: "Posing inside the oversized Push to Prod photo frame, the hackathon run with Anthropic, Elevation Capital and Mesa School",
     width: 1800,
     height: 1202,
   },
@@ -262,13 +262,13 @@ export const photos: readonly Photo[] = [
   },
   {
     src: "/images/image-5.jpg",
-    alt: "Community organizers gathered together at a conference",
+    alt: "Community organisers gathered together at a conference",
     width: 1600,
     height: 732,
   },
   {
     src: "/images/image-7.jpg",
-    alt: "CodeDay participants and organizers posing for a group photograph",
+    alt: "CodeDay participants and organisers posing for a group photograph",
     width: 1500,
     height: 1000,
   },
@@ -280,7 +280,7 @@ export const photos: readonly Photo[] = [
   },
   {
     src: "/images/image-9.jpg",
-    alt: "The Hackerabad organizing team standing in front of the community logo",
+    alt: "The Hackerabad organising team standing in front of the community logo",
     width: 1500,
     height: 1000,
   },
@@ -327,7 +327,7 @@ export const stripPhotos: readonly Photo[] = [
   },
   {
     src: "/images/train-to-the-event.jpg",
-    alt: "A train compartment full of organizers on the way to an event, banners strung above the berth",
+    alt: "A train compartment full of organisers on the way to an event, banners strung above the berth",
     width: 1800,
     height: 1350,
   },
