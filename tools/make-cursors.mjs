@@ -16,9 +16,9 @@
  */
 import { writeFileSync, mkdirSync } from "node:fs";
 
-const SCALE = 1;
+const SCALE = 2;
 
-const INK = { X: "#141414", O: "#ffffff", s: "#a3adb8" };
+const INK = { X: "#1b2431", O: "#ffffff", s: "#a3adb8" };
 
 const CURSORS = {
   arrow: {
@@ -26,22 +26,22 @@ const CURSORS = {
     hotspot: [0, 0],
     fallback: "default",
     rows: [
-      "X...........",
-      "XX..........",
-      "XOX.........",
-      "XOOX........",
-      "XOOOX.......",
-      "XOOOOX......",
-      "XOOOOOX.....",
-      "XOOOOOsX....",
-      "XOOOOOssX...",
-      "XOOOOOsssX..",
-      "XOOOOOXXXX..",
-      "XOOXOsX.....",
-      "XOX.XOsX....",
-      "XX..XOsX....",
-      "X....XssX...",
-      "......XXX...",
+      "X.........",
+      "XX........",
+      "XOX.......",
+      "XOOX......",
+      "XOOOX.....",
+      "XOOOOX....",
+      "XOOOOOX...",
+      "XOOOOOsX..",
+      "XOOOOOssX.",
+      "XOOOXXXXX.",
+      "XOOX.XOsX.",
+      "XOX..XOsX.",
+      "XX...XOsX.",
+      "X....XOsX.",
+      ".....XssX.",
+      "......XXX.",
     ],
   },
   hand: {

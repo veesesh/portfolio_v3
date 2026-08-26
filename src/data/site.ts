@@ -42,23 +42,24 @@ export const site = {
  * Split into fields rather than one marked-up string so the meta description
  * has something plain to read.
  */
-const lead = "I do a bit of everything, and I\u2019m happiest figuring it out as I go.";
+const lead = {
+  before: "I do ",
+  /** Carries the colour, and the quote hangs off it on hover. */
+  pop: "a bit of everything",
+  after: ", and I\u2019m happiest figuring it out as I go.",
+};
 
 export const about = {
   greeting: "hey, nice to e-meet you!",
   lead,
   /**
-   * Parked. The hover-reveal markup that used these was taken off the home page
-   * on 26 Aug 2026 to be reworked later; the words are kept here so the copy
-   * does not have to be written again. Nothing renders them today.
+   * Split so the second half can be marked. The first is the version everyone
+   * quotes; the second is the half that turns it into a compliment.
    */
-  quoteLead: "As they say,",
-  quoteOpen: "\u201cJack of all trades, master of none, but",
-  quoteDots: "\u2026",
-  quoteClose: "\u201d",
-  cta: "there\u2019s more to that quote",
-  rest: "oftentimes better than a master of one.",
-
+  quote: {
+    head: "Jack of all trades, master of none,",
+    tail: "though oftentimes better than master of one.",
+  },
   /** Split around the one link in it, so the description can stay plain text. */
   now: {
     before: "Currently having a good time at ",
@@ -70,7 +71,7 @@ export const about = {
 
 /** The plain-text description. */
 export const aboutPlain =
-  `${about.greeting} ${lead} ` +
+  `${about.greeting} ${lead.before}${lead.pop}${lead.after} ` +
   `${about.now.before}${about.now.link.label}${about.now.after}`;
 
 /**

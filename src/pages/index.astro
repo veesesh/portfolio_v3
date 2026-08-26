@@ -52,7 +52,11 @@ const links = profileLinks.map((link) => ({
       <p class="lede hero__intro">{about.greeting}</p>
 
       <p class="lede hero__intro">
-        {about.lead}{" "}
+        {about.lead.before}<span class="pop" tabindex="0" aria-describedby="jack-quote"
+          >{about.lead.pop}<span class="pop__card" id="jack-quote" role="tooltip"
+            >{about.quote.head} <mark>{about.quote.tail}</mark></span
+          ></span
+        >{about.lead.after}{" "}
         {about.now.before}<a href={about.now.link.href} data-sfx="nav" target="_blank" rel="noreferrer"
           >{about.now.link.label}<span class="sr-only"> (opens in a new tab)</span></a
         >{about.now.after}
@@ -260,6 +264,72 @@ const links = profileLinks.map((link) => ({
   .hero__links a:hover {
     color: var(--accent);
     border-bottom-color: var(--accent);
+  }
+
+  /*
+   * The phrase carries the colour and the quote hangs off it. Focusable as well
+   * as hoverable, because a card that only a mouse can reach is a card half the
+   * visitors never see.
+   */
+  .pop {
+    position: relative;
+    color: var(--pop);
+    font-weight: 500;
+    text-decoration: underline;
+    text-decoration-style: dotted;
+    text-decoration-color: color-mix(in oklab, var(--pop) 45%, transparent);
+    text-underline-offset: 0.22em;
+    cursor: var(--cursor-hand);
+  }
+
+  .pop__card {
+    position: absolute;
+    top: calc(100% + 0.6rem);
+    left: 0;
+    z-index: 40;
+    width: max-content;
+    max-width: min(23rem, 72vw);
+    border: 1px solid var(--rule-strong);
+    border-radius: 9px;
+    background: var(--page);
+    box-shadow: 0 1px 2px rgb(0 0 0 / 0.05), 0 12px 30px rgb(0 0 0 / 0.09);
+    padding: 0.7rem 0.85rem;
+    color: var(--muted);
+    font-family: var(--sans);
+    font-size: 0.86rem;
+    font-weight: 400;
+    line-height: 1.55;
+    /* The card is its own sentence; the justification of the paragraph it sits
+       inside would otherwise stretch it. */
+    text-align: left;
+    text-decoration: none;
+    opacity: 0;
+    visibility: hidden;
+    transform: translateY(3px);
+    transition: opacity 160ms var(--ease), transform 160ms var(--ease), visibility 160ms;
+  }
+
+  .pop:hover .pop__card,
+  .pop:focus-visible .pop__card {
+    opacity: 1;
+    visibility: visible;
+    transform: none;
+  }
+
+  /* The half that turns the insult into a compliment. */
+  .pop__card mark {
+    background: color-mix(in oklab, var(--pop) 16%, transparent);
+    border-radius: 3px;
+    padding: 0.05em 0.15em;
+    color: var(--ink);
+    font-weight: 500;
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .pop__card {
+      transition-duration: 1ms;
+      transform: none;
+    }
   }
 
   .hero__hint {

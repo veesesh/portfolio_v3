@@ -41,6 +41,14 @@
    */
   --name-accent: #217163;
 
+  /*
+   * The one vibrant note, used on the hero phrase that opens the quote card.
+   * The portrait's sunflower amber, lifted until it reads as a colour rather
+   * than a brown: 4.81:1 on the page ground, so it passes as body text. A
+   * brighter orange was tried first and measured 4.38:1, which does not.
+   */
+  --pop: #b3560a;
+
   /* Written every frame by the portrait engine; used only by the tile and
      its halo, so the image can bleed a little colour without the page
      palette depending on it. */
