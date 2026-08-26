@@ -1113,10 +1113,17 @@ select,
 ------------------------------------------------------------------ */
 .note__logo {
   display: inline-block;
-  width: 0.72em;
-  height: auto;
+  width: auto;
+  height: 0.88em;
   margin-left: 0.3em;
-  vertical-align: -0.03em;
+  vertical-align: -0.11em;
+}
+
+/* AWS ships a wordmark rather than a square mark, so it comes down a little to
+   sit level with the type beside it. */
+.note__logo--wide {
+  height: 0.72em;
+  vertical-align: -0.05em;
 }
 
 /* Same behaviour as the hero phrase: hoverable, and focusable so it is not a

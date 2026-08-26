@@ -26,7 +26,7 @@ I have a hard time staying in one lane, but one thing is common:
 
 I have contributed to builder initiatives across formats, geographies and <span class="hint" tabindex="0" aria-describedby="train-note">occasionally modes of transport<span class="hint__card" id="train-note" role="tooltip">A hackathon on a moving train. <a href="https://devfolio.co/blog/we-turned-a-train-into-indias-first-moving-web3-hackathon-and-it-was-beautifully-chaotic/" target="_blank" rel="noreferrer">BlockTrain</a>.</span></span>.
 
-- 3 with Anthropic
+- 3 with Anthropic <img src="/images/logos/claude.png" alt="" class="note__logo" />
     - [Build India](https://buildindia2026.devfolio.co/): a builder-first AI sprint focused on products made for Indian realities;
     - [Push to Prod](https://push-to-prod.devfolio.co/) Hackathon with Genspark & Anthropic (Singapore)
         - My first try at editing a recap video [Video Recap](https://x.com/vee19twt/status/2082062590512160837)
@@ -37,7 +37,7 @@ I have contributed to builder initiatives across formats, geographies and <span 
 
 ### Programs
 
-I also ran the university program for [**Devfolio Student Hackathon Grants with AWS**](https://devfolio-student-hackathon-grants.devfolio.co/overview), helping student organisers access grants, resources, operational support, and the Devfolio platform.
+I also ran the university program for [**Devfolio Student Hackathon Grants with AWS**](https://devfolio-student-hackathon-grants.devfolio.co/overview) <img src="/images/logos/aws.png" alt="" class="note__logo note__logo--wide" />, helping student organisers access grants, resources, operational support, and the Devfolio platform.
 
 I handle a chunk of **University Relations** at Devfolio.
 
