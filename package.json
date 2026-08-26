@@ -6,8 +6,7 @@
     "dev": "astro dev",
     "build": "astro check && astro build",
     "preview": "astro preview",
-    "typecheck": "astro check",
-    "cursors": "node tools/make-cursors.mjs"
+    "typecheck": "astro check"
   },
   "dependencies": {
     "@astrojs/markdown-satteri": "0.3.4",

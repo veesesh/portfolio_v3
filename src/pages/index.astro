@@ -26,9 +26,9 @@ const shelf = (await getCollection("reading"))
 const strip = stripPhotos;
 
 /** Newest first, same order the blogs run in on /reading. */
-const posts = (await getCollection("writing")).sort(
-  (a, b) => b.data.date.valueOf() - a.data.date.valueOf(),
-);
+const posts = (await getCollection("writing"))
+  .sort((a, b) => b.data.date.valueOf() - a.data.date.valueOf())
+  .slice(0, 2);
 
 /**
  * A preview is only offered when its screenshot is actually on disk. Trusting
@@ -106,7 +106,7 @@ const links = profileLinks.map((link) => ({
           title={role.data.organization}
           aside={period(role.data.start, role.data.end)}
           note={role.data.role}
-          href={role.data.href}
+          href={role.id === "devfolio" ? "/build" : role.data.href}
         />
       ))}
     </ul>
@@ -174,7 +174,7 @@ const links = profileLinks.map((link) => ({
   </section>
 
   <section class="section column" aria-labelledby="home-pictures">
-    <SectionHead id="home-pictures" label="Pictures" href="/pictures" seeAll="through my lens" />
+    <SectionHead id="home-pictures" label="Pictures" href="/pictures" seeAll="see the full gallery" />
     <p class="pictures-note">A few frames from the hackathons I&rsquo;ve been lucky to be around.</p>
     <a class="strip" href="/pictures" data-sfx="row" aria-label="Open the pictures page">
       {strip.map((photo, index) => (
@@ -188,7 +188,14 @@ const links = profileLinks.map((link) => ({
         />
       ))}
     </a>
-    <p class="strip-caption">Photo sets I&rsquo;ve shot and a few videos I&rsquo;ve cut together.</p>
+
+    <div class="lens">
+      <h3 class="lens__title">Through my lens</h3>
+      <p class="lens__note">
+        I&rsquo;ve put up some shots and video edits.{" "}
+        <a href="/pictures#pictures-elsewhere" data-sfx="nav">See them <span aria-hidden="true">→</span></a>
+      </p>
+    </div>
   </section>
 
   <section class="section column" aria-label="Other parts of my life">
@@ -279,7 +286,7 @@ const links = profileLinks.map((link) => ({
     text-decoration-style: dotted;
     text-decoration-color: color-mix(in oklab, var(--pop) 45%, transparent);
     text-underline-offset: 0.22em;
-    cursor: var(--cursor-hand);
+    cursor: pointer;
   }
 
   .pop__card {
@@ -376,13 +383,34 @@ const links = profileLinks.map((link) => ({
     padding-block: 0.5rem;
   }
 
-  /* Sits under the frames it describes, so it reads as their caption. */
-  .strip-caption {
+  /* The second half of the section: the gallery is above, this is the work. */
+  .lens {
+    margin-top: 1.6rem;
+    padding-top: 1.3rem;
+    border-top: 1px solid var(--rule);
+  }
+
+  .lens__title {
+    margin: 0 0 0.35rem;
+    color: var(--ink);
+    font-family: var(--display);
+    font-size: 1.05rem;
+    font-weight: 600;
+    letter-spacing: -0.02em;
+  }
+
+  .lens__note {
     max-width: 54ch;
-    margin: 0.75rem 0 0;
+    margin: 0;
     color: var(--muted);
     font-size: 0.92rem;
     line-height: 1.6;
+  }
+
+  .lens__note a {
+    color: var(--accent);
+    text-underline-offset: 0.2em;
+    white-space: nowrap;
   }
 
   .build-note,
