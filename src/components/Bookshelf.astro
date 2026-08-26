@@ -137,24 +137,41 @@ const shelf = books.flatMap((entry) => {
     padding: 0;
     border: 0;
     border-radius: 2px;
-    /* The slot the book comes out of. The lifted slice covers all but the
-       bottom sliver of this box, so what shows through is the gap left behind:
-       the wall at the back of the shelf, a shade darker than the board. */
-    background-color: transparent;
-    transition: background-color 160ms ease;
+    background: transparent;
     cursor: pointer;
   }
 
-  .spine:hover,
-  .spine:focus-visible {
-    /* The back of the shelf: the board's white, dropped a shade, with the
-       bottom a little deeper where the book used to sit against it. */
-    background-image: linear-gradient(to bottom, #e7e6e3 0%, #dcdad6 100%);
+  /*
+   * The slot the book comes out of.
+   *
+   * It reaches 2% below its box on purpose. The measured boxes stop at the
+   * shelf line, but twelve of the eighteen books are photographed sitting up
+   * to 7px past it, and that strip of real book was showing under the gap as a
+   * band of colour. The overhang lands on the board, in the board's own
+   * colour, so it cannot be seen.
+   *
+   * Both colours are sampled from the photograph: the wall behind the books,
+   * and the board they stand on.
+   */
+  .spine::after {
+    content: "";
+    position: absolute;
+    inset: 0 0 -2% 0;
+    z-index: 0;
+    border-radius: 2px;
+    background-image: linear-gradient(to bottom, #d3d3d1 0%, #dcdcda 72%, #e2e2e0 100%);
+    opacity: 0;
+    transition: opacity 160ms ease;
+  }
+
+  .spine:hover::after,
+  .spine:focus-visible::after {
+    opacity: 1;
   }
 
   @media (hover: none), (pointer: coarse) {
-    .spine:hover {
-      background-image: none;
+    .spine:hover::after {
+      opacity: 0;
     }
   }
 
@@ -165,6 +182,7 @@ const shelf = books.flatMap((entry) => {
     content: "";
     position: absolute;
     inset: 0;
+    z-index: 1;
     border-radius: 2px;
     background-image: url("/images/reading-shelf.jpg");
     background-repeat: no-repeat;
