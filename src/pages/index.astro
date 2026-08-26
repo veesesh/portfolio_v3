@@ -120,7 +120,10 @@ const links = profileLinks.map((link) => ({
         {
           title: "Hackathons & Initiatives",
           aside: "Devfolio",
-          note: "I've helped run builder initiatives across India and beyond, including programs with Anthropic and AWS.",
+          noteHtml:
+            "I've helped run builder initiatives across India and beyond, including programs with " +
+            'Anthropic <img src="/images/logos/claude.png" alt="" class="row__logo" /> and ' +
+            'AWS <img src="/images/logos/aws.png" alt="" class="row__logo row__logo--wide" />.',
           href: "/build#initiatives-and-hackathons",
         },
         {
@@ -140,6 +143,7 @@ const links = profileLinks.map((link) => ({
           title={project.title}
           aside={project.aside}
           note={project.note}
+          noteHtml={project.noteHtml}
           href={project.href}
         />
       ))}

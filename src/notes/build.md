@@ -12,7 +12,7 @@
   `#community-experiments` and `#personal-projects`.
 -->
 
-<h2 id="at-devfolio"><img src="/images/logos/devfolio.png" alt="" class="note__logo" /> At Devfolio</h2>
+<h2 id="at-devfolio">At Devfolio <img src="/images/logos/devfolio.png" alt="" class="note__logo" /></h2>
 
 I've been around hackathons since 2020. They got me my first job.
 

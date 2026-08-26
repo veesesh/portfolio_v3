@@ -1113,16 +1113,17 @@ select,
 ------------------------------------------------------------------ */
 .note__logo {
   display: inline-block;
-  width: 0.78em;
+  width: 0.72em;
   height: auto;
-  margin-right: 0.28em;
-  vertical-align: -0.02em;
+  margin-left: 0.3em;
+  vertical-align: -0.03em;
 }
 
 /* Same behaviour as the hero phrase: hoverable, and focusable so it is not a
    card only a mouse can reach. */
 .note .hint {
   position: relative;
+  display: inline-block;
   color: var(--pop);
   text-decoration: underline;
   text-decoration-style: dotted;
@@ -1153,6 +1154,10 @@ select,
   transition: opacity 160ms var(--ease), transform 160ms var(--ease), visibility 160ms;
 }
 
+.note .hint__card a[target="_blank"]::after {
+  content: none;
+}
+
 .note .hint:hover .hint__card,
 .note .hint:focus-visible .hint__card {
   opacity: 1;
@@ -1165,4 +1170,21 @@ select,
     transition-duration: 1ms;
     transform: none;
   }
+}
+
+/* A company mark sitting inline in a row's note. Sized off the text so it
+   tracks the type rather than being pinned to a pixel height. */
+.row__logo {
+  display: inline-block;
+  width: auto;
+  height: 0.92em;
+  margin-left: 0.18em;
+  vertical-align: -0.14em;
+}
+
+/* AWS ships a wordmark rather than a square mark, so it needs more room to
+   stay legible at the same height. */
+.row__logo--wide {
+  height: 0.78em;
+  vertical-align: -0.08em;
 }

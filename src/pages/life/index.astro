@@ -7,7 +7,14 @@ import { lifeSections } from "../../data/site";
 <BaseLayout title="Other parts of my life" description="The non-work things Vee likes, plays, eats, and dreams about.">
   <header class="page-head column">
     <h1>Other parts of my life</h1>
-    <p>The unstructured stuff: things I like, places I want to go, and opinions I may develop too strongly.</p>
+    <p>
+      The unstructured stuff: things I like, places I want to go, and opinions I may develop too
+      strongly. Ask me <span class="hint" tabindex="0" aria-describedby="whats-up"
+        >what&rsquo;s up<span class="hint__card" id="whats-up" role="tooltip"
+          >The sky. You already knew that. Look up.</span
+        ></span
+      > and this is what you get.
+    </p>
   </header>
 
   <section class="section column" aria-label="Life notes">
@@ -17,6 +24,55 @@ import { lifeSections } from "../../data/site";
 </BaseLayout>
 
 <style>
+  /* The joke only works if you have to go looking for it, so the phrase is
+     marked no louder than the copy around it. Focusable, so it is not an
+     easter egg only a mouse can find. */
+  .hint {
+    position: relative;
+    display: inline-block;
+    color: var(--pop);
+    text-decoration: underline;
+    text-decoration-style: dotted;
+    text-decoration-color: color-mix(in oklab, var(--pop) 45%, transparent);
+    text-underline-offset: 0.22em;
+    cursor: help;
+  }
+
+  .hint__card {
+    position: absolute;
+    top: calc(100% + 0.6rem);
+    left: 0;
+    z-index: 40;
+    width: max-content;
+    max-width: min(19rem, 70vw);
+    border: 1px solid var(--rule-strong);
+    border-radius: 9px;
+    background: var(--page);
+    box-shadow: 0 1px 2px rgb(0 0 0 / 0.05), 0 12px 30px rgb(0 0 0 / 0.09);
+    padding: 0.65rem 0.8rem;
+    color: var(--muted);
+    font-size: 0.86rem;
+    line-height: 1.55;
+    opacity: 0;
+    visibility: hidden;
+    transform: translateY(3px);
+    transition: opacity 160ms var(--ease), transform 160ms var(--ease), visibility 160ms;
+  }
+
+  .hint:hover .hint__card,
+  .hint:focus-visible .hint__card {
+    opacity: 1;
+    visibility: visible;
+    transform: none;
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .hint__card {
+      transition-duration: 1ms;
+      transform: none;
+    }
+  }
+
   .life-hint {
     margin: 1.2rem 0 0;
     color: var(--faint);
