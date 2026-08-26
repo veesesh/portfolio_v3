@@ -75,7 +75,7 @@ I began treating those repetitions as systems-design opportunities, and here's w
 
 Things I make outside work, usually with friends, out of curiosity, and under a short deadline.
 
-### Scratch Blogs
+### [Scratch Blogs](https://peerlist.io/sushantspeer/project/scratch-blogs)
 
 *December 2024*
 
@@ -84,7 +84,7 @@ Things I make outside work, usually with friends, out of curiosity, and under a 
 - Stack: React, TypeScript and Express, deployed on an Azure VM.
 - [Backend on GitHub](https://github.com/veesesh/backend_scratchblogs)
 
-### NAASH, Not Another AI Shell
+### [NAASH, Not Another AI Shell](https://devfolio.co/projects/yaash-yet-another-ai-shell-192b)
 
 *November 2024*
 
@@ -93,7 +93,7 @@ Things I make outside work, usually with friends, out of curiosity, and under a 
 - Stack: Node.js, CLI and AI.
 - [On GitHub](https://github.com/Sushants-Git/team-gap)
 
-### Snippet Safe
+### [Snippet Safe](https://devpost.com/software/snippetsafe)
 
 *January 2024*
 

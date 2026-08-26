@@ -20,6 +20,14 @@ const externalLinks = {
 
       ctx.setProperty(node, "target", "_blank");
       ctx.setProperty(node, "rel", "noreferrer");
+
+      // Heading ids are slugged from the heading's text, and this span is text.
+      // Injected inside a linked heading it produced ids like
+      // "scratch-blogs-opens-in-a-new-tab". The ↗ still marks the link, and the
+      // target is still set; only the spoken hint is skipped here.
+      const parent = ctx.parent(node);
+      if (parent && /^h[1-6]$/.test(parent.tagName ?? "")) return;
+
       ctx.appendChild(node, {
         type: "element",
         tagName: "span",
