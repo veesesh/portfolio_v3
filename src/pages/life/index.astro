@@ -7,76 +7,157 @@ import { lifeSections } from "../../data/site";
 <BaseLayout title="Other parts of my life" description="The non-work things Vee likes, plays, eats, and dreams about.">
   <header class="page-head column">
     <h1>Other parts of my life</h1>
-    <p>
-      The unstructured stuff: things I like, places I want to go, and opinions I may develop too
-      strongly. Ask me <span class="hint" tabindex="0" aria-describedby="whats-up"
-        >what&rsquo;s up<span class="hint__card" id="whats-up" role="tooltip"
-          >The sky. You already knew that. Look up.</span
-        ></span
-      > and this is what you get.
-    </p>
+    <p>The unstructured stuff: things I like, places I want to go, and opinions I may develop too strongly.</p>
   </header>
 
   <section class="section column" aria-label="Life notes">
     <LiquidCards sections={lifeSections} />
     <p class="life-hint">Drag a card, or focus one and use the arrow keys.</p>
+
+    <p class="quip" data-quip>
+      Do not ask me &ldquo;What&rsquo;s up?&rdquo;
+      <button class="quip__why" type="button" aria-expanded="false" aria-controls="quip-answer">
+        Why?
+      </button>
+      <span class="quip__card" id="quip-answer">
+        Because you already know what I&rsquo;m going to say.
+        <span class="quip__pick" data-pick></span> Look up.
+      </span>
+    </p>
   </section>
 </BaseLayout>
 
+<script>
+  /*
+   * The answer changes each time it is opened, cycling the three things I
+   * actually say. Set from script rather than written into the markup so the
+   * first reveal is not always the same one.
+   *
+   * The letters of that phrase get a small random tilt, bounce and size, the
+   * trick from Arlan's ransom note: enough that the line reads as assembled by
+   * hand rather than typed, and no more than that.
+   */
+  const ANSWERS = ["The sky.", "The ceiling.", "The fan."];
+
+  document.querySelectorAll<HTMLElement>("[data-quip]").forEach((quip) => {
+    const why = quip.querySelector<HTMLButtonElement>(".quip__why");
+    const pick = quip.querySelector<HTMLElement>("[data-pick]");
+    if (!why || !pick) return;
+
+    let next = Math.floor(Math.random() * ANSWERS.length);
+    const rand = (lo: number, hi: number) => lo + Math.random() * (hi - lo);
+
+    const roll = () => {
+      const answer = ANSWERS[next % ANSWERS.length];
+      next += 1;
+      pick.textContent = "";
+      for (const ch of answer) {
+        if (ch === " ") {
+          pick.append(" ");
+          continue;
+        }
+        const el = document.createElement("span");
+        el.className = "quip__ch";
+        el.textContent = ch;
+        el.style.setProperty("--r", `${rand(-5, 5).toFixed(2)}deg`);
+        el.style.setProperty("--y", `${rand(-1.4, 1.4).toFixed(2)}px`);
+        el.style.setProperty("--s", rand(0.94, 1.08).toFixed(3));
+        pick.append(el);
+      }
+    };
+
+    roll();
+
+    // Re-roll on the way in, so it is a different answer each time rather than
+    // one that shuffles while you are reading it.
+    why.addEventListener("pointerenter", roll);
+    why.addEventListener("focus", roll);
+
+    // Touch has no hover, so the button carries the state there.
+    why.addEventListener("click", () => {
+      const open = quip.toggleAttribute("data-open");
+      why.setAttribute("aria-expanded", String(open));
+      if (open) roll();
+    });
+  });
+</script>
+
 <style>
-  /* The joke only works if you have to go looking for it, so the phrase is
-     marked no louder than the copy around it. Focusable, so it is not an
-     easter egg only a mouse can find. */
-  .hint {
+  /*
+   * A line found rather than presented. It sits at the size of the drag hint
+   * above it and in the same muted ink, so nothing about it asks to be read
+   * first.
+   */
+  .quip {
     position: relative;
-    display: inline-block;
+    max-width: 54ch;
+    margin: 0.35rem 0 0;
+    color: var(--faint);
+    font-size: 0.78rem;
+    font-style: italic;
+    line-height: 1.6;
+  }
+
+  .quip__why {
+    border: 0;
+    background: none;
+    padding: 0;
     color: var(--pop);
+    font-family: inherit;
+    font-size: inherit;
+    font-style: inherit;
     text-decoration: underline;
     text-decoration-style: dotted;
     text-decoration-color: color-mix(in oklab, var(--pop) 45%, transparent);
     text-underline-offset: 0.22em;
-    cursor: help;
+    cursor: pointer;
+    transition: color 140ms var(--ease);
   }
 
-  .hint__card {
-    position: absolute;
-    top: calc(100% + 0.6rem);
-    left: 0;
-    z-index: 40;
-    width: max-content;
-    max-width: min(19rem, 70vw);
-    border: 1px solid var(--rule-strong);
-    border-radius: 9px;
-    background: var(--page);
-    box-shadow: 0 1px 2px rgb(0 0 0 / 0.05), 0 12px 30px rgb(0 0 0 / 0.09);
-    padding: 0.65rem 0.8rem;
+  .quip:hover .quip__why,
+  .quip__why:focus-visible {
+    color: color-mix(in oklab, var(--pop) 80%, var(--ink));
+  }
+
+  /*
+   * Not framed like a tooltip: no border, no shadow, no arrow. It reads as the
+   * rest of the sentence arriving late.
+   */
+  .quip__card {
+    display: block;
+    margin-top: 0.4rem;
     color: var(--muted);
-    font-size: 0.86rem;
-    line-height: 1.55;
+    font-style: normal;
     opacity: 0;
-    visibility: hidden;
-    transform: translateY(3px);
-    transition: opacity 160ms var(--ease), transform 160ms var(--ease), visibility 160ms;
+    transform: translateY(-2px);
+    transition: opacity 200ms var(--ease), transform 200ms var(--ease);
+    pointer-events: none;
   }
 
-  .hint:hover .hint__card,
-  .hint:focus-visible .hint__card {
+  .quip:hover .quip__card,
+  .quip:focus-within .quip__card,
+  .quip[data-open] .quip__card {
     opacity: 1;
-    visibility: visible;
     transform: none;
   }
 
+  /* The punchline, taped down by hand. */
+  .quip__ch {
+    display: inline-block;
+    color: var(--ink);
+    font-weight: 500;
+    transform: translateY(var(--y)) rotate(var(--r)) scale(var(--s));
+  }
+
   @media (prefers-reduced-motion: reduce) {
-    .hint__card {
+    .quip__card {
       transition-duration: 1ms;
       transform: none;
     }
-  }
 
-  .life-hint {
-    margin: 1.2rem 0 0;
-    color: var(--faint);
-    font-size: 0.78rem;
-    font-style: italic;
+    /* Straighten the letters: the tilt is decoration, not information. */
+    .quip__ch {
+      transform: none;
+    }
   }
 </style>
