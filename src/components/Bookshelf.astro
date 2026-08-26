@@ -147,12 +147,14 @@ const shelf = books.flatMap((entry) => {
 
   .spine:hover,
   .spine:focus-visible {
-    background-color: #e4e3e0;
+    /* The back of the shelf: the board's white, dropped a shade, with the
+       bottom a little deeper where the book used to sit against it. */
+    background-image: linear-gradient(to bottom, #e7e6e3 0%, #dcdad6 100%);
   }
 
   @media (hover: none), (pointer: coarse) {
     .spine:hover {
-      background-color: transparent;
+      background-image: none;
     }
   }
 
@@ -179,7 +181,7 @@ const shelf = books.flatMap((entry) => {
   .spine:hover::before,
   .spine:focus-visible::before {
     opacity: 1;
-    transform: translateY(-7.5%) scale(1.03);
+    transform: translateY(-9%);
     box-shadow:
       0 2px 6px -1px rgba(40, 36, 30, 0.3),
       0 10px 18px -6px rgba(40, 36, 30, 0.26);
