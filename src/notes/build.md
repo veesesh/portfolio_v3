@@ -12,11 +12,11 @@
   `#community-experiments` and `#personal-projects`.
 -->
 
-## At Devfolio
+<h2 id="at-devfolio"><img src="/images/logos/devfolio.png" alt="" class="note__logo" /> At Devfolio</h2>
 
 I've been around hackathons since 2020. They got me my first job.
 
-At Devfolio, I manage bits of almost everything: community, ops, support, initiatives & student programs, video editing, photography and everything else in between.
+At [Devfolio](https://devfolio.co), I manage bits of almost everything: community, ops, support, initiatives & student programs, video editing, photography and everything else in between.
 
 I have a hard time staying in one lane, but one thing is common:
 
@@ -24,7 +24,7 @@ I have a hard time staying in one lane, but one thing is common:
 
 ### Initiatives and Hackathons
 
-I have contributed to builder initiatives across formats, geographies and occasionally modes of transport.
+I have contributed to builder initiatives across formats, geographies and <span class="hint" tabindex="0" aria-describedby="train-note">occasionally modes of transport<span class="hint__card" id="train-note" role="tooltip">A hackathon on a moving train. <a href="https://devfolio.co/blog/we-turned-a-train-into-indias-first-moving-web3-hackathon-and-it-was-beautifully-chaotic/" target="_blank" rel="noreferrer">BlockTrain</a>.</span></span>.
 
 - 3 with Anthropic
     - [Build India](https://buildindia2026.devfolio.co/): a builder-first AI sprint focused on products made for Indian realities;
@@ -32,8 +32,8 @@ I have contributed to builder initiatives across formats, geographies and occasi
         - My first try at editing a recap video [Video Recap](https://x.com/vee19twt/status/2082062590512160837)
     - [Push to Prod](https://pushtoprod-india.devfolio.co/overview) Hackathon: Building at the Frontier
 - [BlockTrain](https://blocktrain.devfolio.co/overview): 36-hour hackathon on train (so cool of us, right?)
-- [**ETHIndiaVilla**](https://ethindia-villa.devfolio.co/overview) (yes, a hackathon in a villa): a smaller and more intentional builder format
-- Online support for [**ETHDenver 2026**](https://ethdenver2026.devfolio.co/overview) and [**The Synthesis**](https://devfolio.co/blog/synthesis/) (one of the agentic hackathons)
+- [ETHIndiaVilla](https://ethindia-villa.devfolio.co/overview) (yes, a hackathon in a villa): a smaller and more intentional builder format
+- Online support for [ETHDenver 2026](https://ethdenver2026.devfolio.co/overview) and [The Synthesis](https://devfolio.co/blog/synthesis/) (one of the agentic hackathons)
 
 ### Programs
 
@@ -41,7 +41,7 @@ I also ran the university program for [**Devfolio Student Hackathon Grants with 
 
 I handle a chunk of **University Relations** at Devfolio.
 
-(so when you see a [hackathon](https://devfolio.co/hackathons) appear on Devfolio, there's a decent chance I've looked at it, spoken to the organisers, or clicked the button that lets it through)
+*(so when you see a [hackathon](https://devfolio.co/hackathons) appear on Devfolio, there's a decent chance I've looked at it, spoken to the organisers, or verified it)*
 
 ### Agentic Systems
 
@@ -51,16 +51,14 @@ Community and support work contains a surprising amount of repeated judgment: fi
 
 I began treating those repetitions as systems-design opportunities, and here's what I built:
 
-- Email Automation:
-    - Got frustrated with support and built a system that makes my life easier
-    - An AI-powered email operations agent that reviews incoming support emails, classifies and prioritises requests, and drafts context-aware replies. It automates repetitive inbox work while escalating complex cases to the appropriate team.
+- Email Automation: an AI-powered email operations agent that reviews incoming support emails, classifies and prioritises requests, and drafts context-aware replies. It automates repetitive inbox work while escalating complex cases to the appropriate team.
 - Community Agent:
     - I use Hermes as a personal operations layer I call Devfolio Brain
     - Devfolio Brain is an internal AI agent that turns Devfolio's Notion playbooks and meeting notes into quick, source-backed answers, drafts, and operational updates. It helps the community team plan events, retrieve context, and maintain shared knowledge without having to hunt through documents.
-        - It connects to the tools around the work, retrieves context, runs scheduled routines, and improves as I turn decisions into reusable skills and operating rules.
-        - Basically: **if I have to make the same decision enough times, I eventually try to make the computer remember it.**
+    - It connects to the tools around the work, retrieves context, runs scheduled routines, and improves as I turn decisions into reusable skills and operating rules.
 - Support Bot:
     - I built a multi-channel RAG assistant around Devfolio's guide and blog. It combines semantic and full-text retrieval, expands neighbouring context, returns source links, keeps conversation context, and escalates when the evidence is not strong enough.
+    - It runs as a Telegram bot, so anyone can ask it a question about the platform directly.
 
 ### Community Experiments
 

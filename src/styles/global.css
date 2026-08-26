@@ -1105,3 +1105,64 @@ select,
   margin-top: 0.4rem !important;
   font-size: 0.92rem;
 }
+
+/* ------------------------------------------------------------------
+   Note extras
+   The logo beside a heading, and the hover card on an aside. Global
+   because both are written as raw HTML inside the markdown note.
+------------------------------------------------------------------ */
+.note__logo {
+  display: inline-block;
+  width: 0.78em;
+  height: auto;
+  margin-right: 0.28em;
+  vertical-align: -0.02em;
+}
+
+/* Same behaviour as the hero phrase: hoverable, and focusable so it is not a
+   card only a mouse can reach. */
+.note .hint {
+  position: relative;
+  color: var(--pop);
+  text-decoration: underline;
+  text-decoration-style: dotted;
+  text-decoration-color: color-mix(in oklab, var(--pop) 45%, transparent);
+  text-underline-offset: 0.22em;
+  cursor: help;
+}
+
+.note .hint__card {
+  position: absolute;
+  top: calc(100% + 0.6rem);
+  left: 0;
+  z-index: 40;
+  width: max-content;
+  max-width: min(21rem, 70vw);
+  border: 1px solid var(--rule-strong);
+  border-radius: 9px;
+  background: var(--page);
+  box-shadow: 0 1px 2px rgb(0 0 0 / 0.05), 0 12px 30px rgb(0 0 0 / 0.09);
+  padding: 0.65rem 0.8rem;
+  color: var(--muted);
+  font-size: 0.86rem;
+  line-height: 1.55;
+  text-decoration: none;
+  opacity: 0;
+  visibility: hidden;
+  transform: translateY(3px);
+  transition: opacity 160ms var(--ease), transform 160ms var(--ease), visibility 160ms;
+}
+
+.note .hint:hover .hint__card,
+.note .hint:focus-visible .hint__card {
+  opacity: 1;
+  visibility: visible;
+  transform: none;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .note .hint__card {
+    transition-duration: 1ms;
+    transform: none;
+  }
+}
