@@ -26,13 +26,16 @@ const display = font("node_modules/@fontsource-variable/bricolage-grotesque/file
 const sans = font("node_modules/@fontsource-variable/geist/files/geist-latin-wght-normal.woff2");
 const mono = font("public/fonts/JetBrainsMono[wght].ttf");
 
-const NAV = ["build", "reading", "listening", "pictures", "references"];
+// The portrait from the hero, embedded rather than linked: Quick Look renders
+// the SVG as a standalone file with no server behind it.
+const portrait = readFileSync("public/portrait/sketch.jpg").toString("base64");
 
 // No em dashes and no emoji anywhere in here: this text is read by scrapers and
 // rendered at small sizes in other people's timelines.
 const NAME = "Vee";
 const ROLE = "Community and Operations, Devfolio";
-const PLACE = "Hyderabad / Bengaluru";
+const HANDLES = ["github.com/veesesh", "x.com/vee19twt", "linkedin.com/in/vee19"];
+const SITE = "veesesh.tech";
 
 const svg = `<svg xmlns="http://www.w3.org/2000/svg" width="${W}" height="${W}" viewBox="0 0 ${W} ${W}">
   <defs>
@@ -53,6 +56,9 @@ const svg = `<svg xmlns="http://www.w3.org/2000/svg" width="${W}" height="${W}" 
       <stop offset="0" stop-color="#faf2e6" stop-opacity="0.95"/>
       <stop offset="1" stop-color="#faf2e6" stop-opacity="0"/>
     </radialGradient>
+    <clipPath id="frame">
+      <rect x="90" y="185" width="252" height="252" rx="20"/>
+    </clipPath>
   </defs>
 
   <rect width="${W}" height="${W}" fill="#ffffff"/>
@@ -63,19 +69,28 @@ const svg = `<svg xmlns="http://www.w3.org/2000/svg" width="${W}" height="${W}" 
     <rect width="${W}" height="${H}" fill="url(#teal)"/>
     <rect width="${W}" height="${H}" fill="url(#amber)"/>
 
-    <text x="90" y="286" font-family="Display" font-size="164" font-weight="600"
-          letter-spacing="-6" fill="#141414">${NAME}</text>
+    <rect x="90" y="185" width="252" height="252" rx="20" fill="#141414" opacity="0.07"
+          transform="translate(0 6)"/>
+    <image href="data:image/jpeg;base64,${portrait}" x="90" y="185" width="252" height="252"
+           preserveAspectRatio="xMidYMid slice" clip-path="url(#frame)"/>
 
-    <text x="94" y="348" font-family="Sans" font-size="34" font-weight="400"
+    <text x="408" y="284" font-family="Display" font-size="132" font-weight="600"
+          letter-spacing="-5" fill="#141414">${NAME}</text>
+
+    <text x="412" y="336" font-family="Sans" font-size="30" font-weight="400"
           fill="#6b6b6b">${ROLE}</text>
 
-    <line x1="90" y1="452" x2="${W - 90}" y2="452" stroke="#141414" stroke-opacity="0.11" stroke-width="1"/>
+    ${HANDLES.map((hand, i) =>
+      `<text x="412" y="${406 + i * 38}" font-family="Mono" font-size="21"
+             fill="#6b6b6b" letter-spacing="0.5">${hand}</text>`).join("\n    ")}
 
-    <text x="92" y="512" font-family="Mono" font-size="22" fill="#6b6b6b"
-          letter-spacing="1">${NAV.join("     ")}</text>
+    <line x1="90" y1="524" x2="${W - 90}" y2="524" stroke="#141414" stroke-opacity="0.1" stroke-width="1"/>
 
-    <text x="${W - 90}" y="512" text-anchor="end" font-family="Mono" font-size="22"
-          fill="#8d8d8d" letter-spacing="1">${PLACE}</text>
+    <text x="90" y="568" font-family="Mono" font-size="21" fill="#8d8d8d"
+          letter-spacing="1">${SITE}</text>
+
+    <text x="${W - 90}" y="568" text-anchor="end" font-family="Mono" font-size="21"
+          fill="#8d8d8d" letter-spacing="1">Hyderabad / Bengaluru</text>
   </g>
 </svg>`;
 
