@@ -91,6 +91,7 @@ const allNavigation: readonly SiteLink[] = [
   { label: "reading", href: "/reading" },
   { label: "listening", href: "/listening" },
   { label: "pictures", href: "/pictures" },
+  { label: "references", href: "/references" },
 ];
 
 export const navigation: readonly SiteLink[] = allNavigation;

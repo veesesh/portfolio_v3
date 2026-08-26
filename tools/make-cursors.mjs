@@ -18,53 +18,56 @@ import { writeFileSync, mkdirSync } from "node:fs";
 
 const SCALE = 2;
 
-const INK = { X: "#1b2431", O: "#ffffff", s: "#a3adb8" };
+// Four inks, traced off the cursor on rishi.design: dark outline, white body,
+// and two greys. The greys are what make it read as a drawing rather than a
+// silhouette — `l` is the soft edge the light catches, `s` the shadow under it.
+// X stays on this site's ink rather than the traced #1b2632; the two are within
+// two units of each other and the token keeps the cursor in the page's palette.
+const INK = { X: "#1b2431", O: "#ffffff", l: "#cccccc", s: "#9d9d9d" };
 
 const CURSORS = {
   arrow: {
-    // The point of the arrow, which is where a click actually lands.
-    hotspot: [0, 0],
+    // The point of the arrow, which is where a click actually lands. The tip
+    // sits one art pixel in from the left edge, so this is not 0 0.
+    hotspot: [1.5, 0],
     fallback: "default",
     rows: [
-      "X.........",
-      "XX........",
-      "XOX.......",
-      "XOOX......",
-      "XOOOX.....",
-      "XOOOOX....",
-      "XOOOOOX...",
-      "XOOOOOsX..",
-      "XOOOOOssX.",
-      "XOOOXXXXX.",
-      "XOOX.XOsX.",
-      "XOX..XOsX.",
-      "XX...XOsX.",
-      "X....XOsX.",
-      ".....XssX.",
-      "......XXX.",
+      ".XX.........",
+      "XOOXX.......",
+      "XOOOOXX.....",
+      "XlOOOOOXX...",
+      "XlOOOOOOOXX.",
+      "XllOOOOOOOOX",
+      ".XlOOOOOOOsX",
+      ".XllOOOOOssX",
+      "..XlOOOOOOsX",
+      "..XllOOlOOOX",
+      "...XlOsllOOX",
+      "...XlsslllsX",
+      "....XssXllsX",
+      "....XsX.XlsX",
+      ".....X...XX.",
     ],
   },
   hand: {
-    // The tip of the pointing finger.
-    hotspot: [4.5, 0],
+    // The tip of the pointing finger, which is the tall left prong.
+    hotspot: [1.5, 0],
     fallback: "pointer",
     rows: [
-      "....XX..........",
-      "...XOOX.........",
-      "...XOOX.........",
-      "...XOOX.........",
-      "...XOOX.........",
-      "...XOOXXX.......",
-      "...XOOXOOXX.....",
-      "...XOOXOOXOOX...",
-      "XX.XOOXOOXOOX...",
-      "XOOXOOOOOOOOX...",
-      "XOOOOOOOOOOOX...",
-      ".XOOOOOOOOOsX...",
-      "..XOOOOOsssX....",
-      "...XOOOOOssX....",
-      "...XOOOsssX.....",
-      "...XXXXXXXX.....",
+      ".XX...........",
+      "XOOX...XXX....",
+      "XOOOX.XOOOX...",
+      "XlOOOXOOOOOX..",
+      "XllOOOOOOOOOX.",
+      "XlllOOOOOOOOX.",
+      ".XlllOOOOOOOOX",
+      "..XOOOOOOOOOOX",
+      "..XOOOOOOOOOsX",
+      "..XssssslOOssX",
+      "..XsssssllsssX",
+      "..XsssssllssX.",
+      "...XXXXXXlsX..",
+      ".........XX...",
     ],
   },
 };

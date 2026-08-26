@@ -1,0 +1,50 @@
+---
+/**
+ * Credit where it is owed. Each note says what was actually taken, so this
+ * stays a reference list rather than a list of sites that merely look nice.
+ */
+import BaseLayout from "../../layouts/BaseLayout.astro";
+import LinkRow from "../../components/LinkRow.astro";
+
+const references = [
+  {
+    title: "Arlan's Vault",
+    aside: "arlan.me",
+    note: "The liquid joints between the cards on /life came from its Liquid UI note, and the reveal I tried on the hero quote from Ghosty reveal and The typer.",
+    href: "https://www.arlan.me/vault",
+  },
+  {
+    title: "rishi.design",
+    aside: "rishi.design",
+    note: "The pixel cursor, and the idea of showing a screenshot of where a link goes while you hover it.",
+    href: "https://rishi.design/",
+  },
+  {
+    title: "recent.design",
+    aside: "recent.design",
+    href: "https://recent.design/",
+  },
+];
+---
+
+<BaseLayout
+  title="References"
+  description="The sites Vee took references from while building this portfolio."
+>
+  <header class="page-head column">
+    <h1>References</h1>
+    <p>
+      I took references from the sites below while building this portfolio. The effects are my own
+      implementations, but the ideas started here.
+    </p>
+  </header>
+
+  <section class="section column" aria-labelledby="references-list">
+    <div class="section-head"><h2 id="references-list">Where things came from</h2></div>
+    <ul class="rows">
+      {references.map((item) => (
+        <LinkRow title={item.title} aside={item.aside} note={item.note} href={item.href} />
+      ))}
+    </ul>
+  </section>
+</BaseLayout>
