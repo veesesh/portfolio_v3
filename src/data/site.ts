@@ -105,11 +105,6 @@ export const profileLinks: readonly SiteLink[] = [
     preview: "/images/previews/linkedin.png",
   },
   { label: "Email", href: "mailto:curiousvee19@gmail.com" },
-  {
-    label: "Résumé",
-    href: "https://drive.google.com/file/d/1RI-UVdS7dAdpau2HiPMdHZtdA3trkPKX/view?usp=sharing",
-    preview: "/images/previews/resume.png",
-  },
 ];
 
 /** Public Spotify source; swapping the playlist only requires changing this URL. */

@@ -266,6 +266,13 @@ export class LiquidField {
     this.cards.forEach((card, i) => {
       card.addEventListener("pointerdown", (event) => {
         if (event.button !== 0) return;
+
+        // A press that starts on a link is a click, not a drag. Capturing the
+        // pointer here would route every later event to the card and the
+        // anchor would never see the click at all, which is why the links on
+        // /life did nothing.
+        if ((event.target as Element | null)?.closest("a, button")) return;
+
         card.setPointerCapture(event.pointerId);
         card.dataset.dragging = "true";
         const from = { x: event.clientX, y: event.clientY };
