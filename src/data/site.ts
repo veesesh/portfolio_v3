@@ -33,7 +33,7 @@ export const site = {
   location: "Hyderabad / Bengaluru",
   email: "curiousvee19@gmail.com",
   /** The keyboard shortcut in the footer opens this. */
-  telegram: { label: "Telegram", handle: "@vee19tel", href: "https://t.me/vee19tel" },
+  telegram: { label: "Telegram", handle: "@veesesh", href: "https://t.me/veesesh" },
 } as const;
 
 /**
