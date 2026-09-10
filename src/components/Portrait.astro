@@ -51,7 +51,8 @@ const { alt } = Astro.props;
   /* Soft coloured halo behind the tile, tracking the cursor. */
   .portrait__halo {
     position: absolute;
-    inset: -18%;
+    /* Keep the glow within the narrowest page gutter. */
+    inset: max(-18%, -1rem);
     z-index: 0;
     pointer-events: none;
     border-radius: 50%;
@@ -65,6 +66,7 @@ const { alt } = Astro.props;
   }
 
   .portrait__tile {
+    touch-action: pan-y pinch-zoom;
     position: relative;
     z-index: 1;
     width: 100%;

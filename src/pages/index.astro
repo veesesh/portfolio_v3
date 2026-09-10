@@ -85,7 +85,7 @@ const links = profileLinks.map((link) => ({
         drop a hi on{" "}
         <a href={site.telegram.href} data-sfx="nav" target="_blank" rel="noreferrer"
           >telegram<span class="sr-only"> (opens in a new tab)</span></a
-        >; press <kbd>T</kbd>
+        ><span class="hero__shortcut">; press <kbd>T</kbd></span>
       </p>
     </div>
 
@@ -234,11 +234,8 @@ const links = profileLinks.map((link) => ({
   .hero__intro {
     max-width: 40ch;
     margin: 1.3rem 0 0;
-    text-align: justify;
-    /* Justifying a 40ch measure without hyphenation opens rivers of white space
-       between words. Auto-hyphenation lets the browser break long words instead
-       of stretching the spaces around them. */
-    hyphens: auto;
+    text-align: start;
+    hyphens: manual;
   }
 
 
@@ -321,7 +318,7 @@ const links = profileLinks.map((link) => ({
   }
 
   .pop:hover .pop__card,
-  .pop:focus-visible .pop__card {
+  .pop:focus .pop__card {
     opacity: 1;
     visibility: visible;
     transform: none;
@@ -465,16 +462,30 @@ const links = profileLinks.map((link) => ({
   @media (max-width: 720px) {
     .hero {
       grid-template-columns: 1fr;
-      gap: 1.75rem;
+      gap: 1.5rem;
+      padding-block: 1.25rem 2.5rem;
     }
 
     .hero__figure {
       order: -1;
-      width: 11rem;
+      width: 8rem;
     }
   }
 
+  @media (pointer: coarse) {
+    .hero__shortcut { display: none; }
+    .hero__links a { min-height: 44px; display: inline-flex; align-items: center; }
+  }
+
   @media (max-width: 640px) {
+    .hero__links a { min-height: 44px; display: inline-flex; align-items: center; }
+    .pop__card {
+      position: fixed;
+      inset: auto 1rem 1rem;
+      width: auto;
+      max-width: none;
+    }
+
     .strip {
       grid-template-columns: repeat(2, minmax(0, 1fr));
     }

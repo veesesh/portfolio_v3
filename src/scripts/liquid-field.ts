@@ -203,17 +203,23 @@ export class LiquidField {
     const w = this.stage.clientWidth;
     const cols = w < 560 ? 1 : 2;
     const cardW = (w - this.gap * (cols - 1)) / cols;
+    // Measure wrapped content so larger text and narrow cards stay inside the surface.
+    const cardH = Math.max(this.cardH, ...this.cards.map((card) => {
+      card.style.width = `${cardW}px`;
+      card.style.height = "auto";
+      return Math.ceil(card.getBoundingClientRect().height);
+    }));
     const rows = Math.ceil(this.cards.length / cols);
 
     this.slots = this.cards.map((_, i) => ({
       x: (i % cols) * (cardW + this.gap),
-      y: Math.floor(i / cols) * (this.cardH + this.gap),
+      y: Math.floor(i / cols) * (cardH + this.gap),
       w: cardW,
-      h: this.cardH,
+      h: cardH,
       r: RADIUS,
     }));
 
-    const h = rows * this.cardH + (rows - 1) * this.gap;
+    const h = rows * cardH + (rows - 1) * this.gap;
     this.stage.style.height = `${h}px`;
     this.paint.setAttribute("viewBox", `0 0 ${w} ${h}`);
     this.paint.setAttribute("width", `${w}`);
@@ -265,7 +271,7 @@ export class LiquidField {
   private bind() {
     this.cards.forEach((card, i) => {
       card.addEventListener("pointerdown", (event) => {
-        if (event.button !== 0) return;
+        if (event.button !== 0 || event.pointerType === "touch") return;
 
         // A press that starts on a link is a click, not a drag. Capturing the
         // pointer here would route every later event to the card and the

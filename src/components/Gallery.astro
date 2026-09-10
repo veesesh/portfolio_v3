@@ -81,7 +81,9 @@ const { photos } = Astro.props;
     width: min(94vw, 76rem);
     max-width: none;
     height: min(90vh, 52rem);
-    max-height: none;
+    height: min(90dvh, 52rem);
+    max-height: calc(100dvh - 1rem);
+    overflow: hidden;
     padding: 0;
     border: 1px solid var(--rule-strong);
     border-radius: 12px;
@@ -123,6 +125,7 @@ const { photos } = Astro.props;
     border-radius: 999px;
     background: transparent;
     padding: 0.4rem 0.8rem;
+    min-height: 44px;
     font-family: var(--mono);
     font-size: 0.72rem;
     cursor: pointer;
@@ -135,18 +138,20 @@ const { photos } = Astro.props;
   }
 
   .photo-dialog__image {
-    display: grid;
+    position: relative;
+    min-width: 0;
     min-height: 0;
-    place-items: center;
     overflow: hidden;
     padding: 0.9rem;
   }
 
   .photo-dialog__image img {
-    max-width: 100%;
-    max-height: 100%;
-    width: auto;
-    height: auto;
+    position: absolute;
+    inset: 0.9rem;
+    width: calc(100% - 1.8rem);
+    height: calc(100% - 1.8rem);
+    max-width: none;
+    max-height: none;
     object-fit: contain;
     border-radius: 4px;
   }
@@ -173,12 +178,14 @@ const { photos } = Astro.props;
     .photo-dialog {
       width: calc(100vw - 1rem);
       height: calc(100vh - 1rem);
+      height: calc(100dvh - 1rem);
     }
 
     .photo-dialog__bar p {
-      overflow: hidden;
-      text-overflow: ellipsis;
-      white-space: nowrap;
+      min-width: 0;
+      overflow-wrap: anywhere;
+      max-height: 25dvh;
+      overflow-y: auto;
     }
   }
 </style>

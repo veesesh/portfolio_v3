@@ -90,15 +90,15 @@
 }
 
 html {
-  min-width: 320px;
   background: var(--page);
   -webkit-text-size-adjust: 100%;
 }
 
 body {
   margin: 0;
-  min-width: 320px;
-  overflow-x: hidden;
+  padding-inline: env(safe-area-inset-left) env(safe-area-inset-right);
+  padding-bottom: env(safe-area-inset-bottom);
+  overflow-x: clip;
   background: transparent;
   color: var(--ink);
   font-family: var(--sans);
@@ -1166,7 +1166,7 @@ select,
 }
 
 .note .hint:hover .hint__card,
-.note .hint:focus-visible .hint__card {
+.note .hint:focus .hint__card {
   opacity: 1;
   visibility: visible;
   transform: none;
@@ -1194,4 +1194,79 @@ select,
 .row__logo--wide {
   height: 0.78em;
   vertical-align: -0.08em;
+}
+
+/* Responsive content should reflow rather than depend on viewport clipping. */
+.column, .header-right, .site-footer__end, .row__title, .row__note {
+  min-width: 0;
+}
+.row__title, .row__note, .prose, .note, .page-head h1 {
+  overflow-wrap: anywhere;
+}
+.section-head {
+  flex-wrap: wrap;
+  gap: 0.65rem 1.5rem;
+}
+.prose pre, .note pre {
+  max-width: 100%;
+  overflow-x: auto;
+}
+body:has(dialog[open]) {
+  overflow: hidden;
+}
+
+@media (max-width: 640px) {
+  .row__link, .row__body {
+    grid-template-columns: minmax(0, 1fr);
+    gap: 0.3rem;
+    padding-block: 1rem;
+  }
+  .row__year {
+    white-space: normal;
+  }
+  .row__note {
+    grid-column: 1;
+    margin-top: 0.2rem;
+  }
+  .main-nav {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 0.1rem 0.75rem;
+  }
+  .main-nav a, .footer-links a, .see-all, .rainbow-toggle {
+    display: inline-flex;
+    align-items: center;
+    min-height: 44px;
+  }
+  .site-header {
+    padding-block: 0.75rem;
+  }
+  .note .hint__card {
+    position: fixed;
+    inset: auto max(1rem, env(safe-area-inset-right)) max(1rem, env(safe-area-inset-bottom)) max(1rem, env(safe-area-inset-left));
+    width: auto;
+    max-width: none;
+  }
+}
+
+@media (pointer: coarse) {
+  .main-nav a, .footer-links a, .see-all, .rainbow-toggle {
+    min-height: 44px;
+    display: inline-flex;
+    align-items: center;
+  }
+  .liquid, .page-head__icon {
+    touch-action: pan-y pinch-zoom;
+  }
+  .liquid--draggable .liquid-card {
+    cursor: auto;
+  }
+}
+
+/* Touch users can read the full name without a hover gesture. */
+@media (hover: none) {
+  .name-reveal--hero .name-reveal__rest {
+    max-width: 6ch;
+    opacity: 1;
+  }
 }
